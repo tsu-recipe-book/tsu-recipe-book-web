@@ -24,4 +24,18 @@ export const productService = {
   deleteProduct: async (id: string): Promise<void> => {
     await api.delete(`/api/v1/products/${id}`);
   },
+
+  createProduct: async (data: FormData): Promise<ProductDto> => {
+    const response = await api.post<ProductDto>('/api/v1/products', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  updateProduct: async (id: string, data: FormData): Promise<ProductDto> => {
+    const response = await api.put<ProductDto>(`/api/v1/products/${id}`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
 };

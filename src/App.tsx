@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProductListPage from './pages/ProductListPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import ProductCreatePage from './pages/ProductCreatePage';
+import ProductEditPage from './pages/ProductEditPage';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/new" element={<ProductCreatePage />} />
           <Route path="/products/:id" element={<ProductDetailsPage />} />
+          <Route path="/products/:id/edit" element={<ProductEditPage />} />
           <Route path="/dishes" element={<div>Dishes List (Coming Soon)</div>} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
