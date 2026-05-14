@@ -99,7 +99,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
       return;
     }
     if (selectedIngredients.length === 0) {
-      setError(t('dishes.form.ingredientsError') || 'Add at least one ingredient');
+      setError(t('dishes.form.ingredientsError'));
       return;
     }
 
@@ -124,7 +124,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
     try {
       await onSubmit(formData);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      setError(err.response?.data?.message || t('common.error'));
     }
   };
 
@@ -235,7 +235,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
                       onChange={e => updateWeight(ing.product.id, Number(e.target.value))}
                       className="w-20 px-3 py-2 rounded-xl border border-gray-100 bg-white focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none transition-all font-bold text-gray-700 text-center"
                     />
-                    <span className="text-xs font-black text-gray-400 uppercase tracking-widest">г</span>
+                    <span className="text-xs font-black text-gray-400 uppercase tracking-widest">{t('dishes.form.weightUnit')}</span>
                   </div>
                   <button
                     type="button"
@@ -249,7 +249,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
               {selectedIngredients.length === 0 && (
                 <div className="py-10 text-center border-2 border-dashed border-gray-100 rounded-3xl">
                   <Utensils className="w-10 h-10 text-gray-100 mx-auto mb-2" />
-                  <p className="text-gray-400 text-sm font-medium">{t('dishes.form.addIngredientPrompt') || 'Start by adding some ingredients'}</p>
+                  <p className="text-gray-400 text-sm font-medium">{t('dishes.form.addIngredientPrompt')}</p>
                 </div>
               )}
             </div>
@@ -335,12 +335,12 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
               {selectedIngredients.slice(0, 5).map(ing => (
                 <div key={ing.product.id} className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-xl">
                   <span className="font-bold text-gray-700 text-sm">{ing.product.name}</span>
-                  <span className="text-xs font-black text-indigo-600">{ing.weight}г</span>
+                  <span className="text-xs font-black text-indigo-600">{ing.weight}{t('dishes.form.weightUnit')}</span>
                 </div>
               ))}
               {selectedIngredients.length > 5 && (
                 <div className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest pt-2">
-                  + {selectedIngredients.length - 5} {t('dishes.form.moreIngredients') || 'more'}
+                  + {selectedIngredients.length - 5} {t('dishes.form.moreIngredients')}
                 </div>
               )}
             </div>
@@ -352,7 +352,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
              </div>
              <div>
                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('products.form.nutritionPer100g')}</p>
-               <p className="text-sm font-bold text-gray-600 italic">Backend will calculate final values</p>
+               <p className="text-sm font-bold text-gray-600 italic">{t('dishes.form.backendCalculationNote')}</p>
              </div>
           </div>
         </div>
@@ -361,7 +361,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
           <h4 className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">{t('products.form.editorTipTitle')}</h4>
           <p className="text-sm font-medium leading-relaxed opacity-90">
-            {t('dishes.form.editorTipText') || 'Add various ingredients to make your dish balanced and tasty!'}
+            {t('dishes.form.editorTipText')}
           </p>
         </div>
       </div>

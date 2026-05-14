@@ -6,7 +6,9 @@
     "edit": "Edit",
     "loading": "Loading...",
     "cancel": "Cancel",
-    "actions": "Actions"
+    "actions": "Actions",
+    "error": "An error occurred",
+    "notFound": "Page not found"
   },
   "nav": {
     "products": "Products",
@@ -96,6 +98,11 @@
       "ingredients": "Ingredients",
       "addIngredient": "Add Ingredient",
       "weight": "Weight (g)",
+      "weightUnit": "g",
+      "ingredientsError": "Add at least one ingredient",
+      "addIngredientPrompt": "Start by adding some ingredients",
+      "moreIngredients": "more",
+      "backendCalculationNote": "Final values will be calculated by the server",
       "photos": "Photos",
       "searchPlaceholder": "Search dishes..."
     },

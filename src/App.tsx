@@ -60,7 +60,7 @@ function App() {
           <Route path="/dishes/new" element={<DishCreatePage />} />
           <Route path="/dishes/:id" element={<DishDetailsPage />} />
           <Route path="/dishes/:id/edit" element={<DishEditPage />} />
-          <Route path="*" element={<div>404 Not Found</div>} />
+          <Route path="*" element={<div>{t('common.notFound')}</div>} />
         </Routes>
       </main>
     </div>

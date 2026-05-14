@@ -6,7 +6,9 @@
     "edit": "Редактировать",
     "loading": "Загрузка...",
     "cancel": "Отмена",
-    "actions": "Действия"
+    "actions": "Действия",
+    "error": "Произошла ошибка",
+    "notFound": "Страница не найдена"
   },
   "nav": {
     "products": "Продукты",
@@ -96,6 +98,11 @@
       "ingredients": "Ингредиенты",
       "addIngredient": "Добавить ингредиент",
       "weight": "Вес (г)",
+      "weightUnit": "г",
+      "ingredientsError": "Добавьте хотя бы один ингредиент",
+      "addIngredientPrompt": "Начните с добавления ингредиентов",
+      "moreIngredients": "еще",
+      "backendCalculationNote": "Итоговые значения будут рассчитаны сервером",
       "photos": "Фотографии",
       "searchPlaceholder": "Поиск блюд..."
     },

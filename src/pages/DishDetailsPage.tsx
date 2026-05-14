@@ -168,7 +168,7 @@ const DishDetailsPage: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-sm font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">
-                      {ing.weight} {t('dishes.form.weight').split('(')[1].replace(')', '')}
+                      {ing.weight}{t('dishes.form.weightUnit')}
                     </span>
                     <ChevronRight className="w-4 h-4 text-gray-300 group-hover:translate-x-1 transition-transform" />
                   </div>

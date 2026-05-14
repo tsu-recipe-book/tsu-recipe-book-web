@@ -20,7 +20,7 @@ import { cn } from '../utils/cn';
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -81,7 +81,7 @@ const ProductDetailsPage: React.FC = () => {
   };
 
   const formattedUpdateDate = product.updatedAt 
-    ? new Date(product.updatedAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    ? new Date(product.updatedAt).toLocaleDateString(i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null;
 
   return (
@@ -124,7 +124,7 @@ const ProductDetailsPage: React.FC = () => {
             ) : (
               <div className="text-gray-400 flex flex-col items-center">
                 <AlertCircle className="w-12 h-12 mb-2 opacity-20" />
-                <span>No images available</span>
+                <span>{t('products.info.noImage')}</span>
               </div>
             )}
           </div>
@@ -144,7 +144,7 @@ const ProductDetailsPage: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               {product.flags.map(flag => (
                 <span key={flag} className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
-                  {flag.replace(/_/g, ' ')}
+                  {t(`products.flags.${flag}`)}
                 </span>
               ))}
             </div>

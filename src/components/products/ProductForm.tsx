@@ -120,7 +120,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
     try {
       await onSubmit(formData);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save product');
+      setError(err.response?.data?.message || t('common.error'));
     }
   };
 
