@@ -58,12 +58,13 @@ export interface DishDto {
   name: string;
   category: DishCategory;
   ingredients: IngredientDto[];
-  protein: number;
-  fat: number;
-  carbs: number;
+  proteins: number;
+  fats: number;
+  carbohydrates: number;
   calories: number;
   flags: ProductFlag[];
-  photoUrls: string[];
+  photos: string[];
+  updatedAt: string;
 }
 
 export interface DishListItem {

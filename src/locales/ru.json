@@ -6,7 +6,9 @@
     "edit": "Редактировать",
     "loading": "Загрузка...",
     "cancel": "Отмена",
-    "actions": "Действия"
+    "actions": "Действия",
+    "error": "Произошла ошибка",
+    "notFound": "Страница не найдена"
   },
   "nav": {
     "products": "Продукты",
@@ -79,6 +81,41 @@
       "VEGAN": "Веган",
       "GLUTEN_FREE": "Без глютена",
       "SUGAR_FREE": "Без сахара"
+    }
+  },
+  "dishes": {
+    "listTitle": "Блюда",
+    "detailsTitle": "Детали блюда",
+    "createNew": "Создать новое блюдо",
+    "editDish": "Редактировать блюдо",
+    "notFound": "Блюдо не найдено",
+    "backToList": "Вернуться к списку",
+    "deleteConfirm": "Вы уверены, что хотите удалить это блюдо?",
+    "noDishesFound": "Блюд по вашему запросу не найдено.",
+    "form": {
+      "name": "Название блюда",
+      "category": "Категория",
+      "ingredients": "Ингредиенты",
+      "addIngredient": "Добавить ингредиент",
+      "weight": "Вес (г)",
+      "weightUnit": "г",
+      "ingredientsError": "Добавьте хотя бы один ингредиент",
+      "addIngredientPrompt": "Начните с добавления ингредиентов",
+      "moreIngredients": "еще",
+      "backendCalculationNote": "Итоговые значения будут рассчитаны сервером",
+      "photos": "Фотографии",
+      "searchPlaceholder": "Поиск блюд...",
+      "editorTipTitle": "Совет",
+      "editorTipText": "Добавляйте разнообразные ингредиенты, чтобы сделать ваше блюдо сбалансированным и вкусным!"
+    },
+    "categories": {
+      "DESSERT": "Десерт",
+      "FIRST": "Первое",
+      "SECOND": "Второе",
+      "DRINK": "Напиток",
+      "SALAD": "Салат",
+      "SOUP": "Суп",
+      "SNACK": "Закуска"
     }
   }
 }

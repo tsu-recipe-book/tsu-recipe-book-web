@@ -6,7 +6,9 @@
     "edit": "Edit",
     "loading": "Loading...",
     "cancel": "Cancel",
-    "actions": "Actions"
+    "actions": "Actions",
+    "error": "An error occurred",
+    "notFound": "Page not found"
   },
   "nav": {
     "products": "Products",
@@ -79,6 +81,41 @@
       "VEGAN": "Vegan",
       "GLUTEN_FREE": "Gluten Free",
       "SUGAR_FREE": "Sugar Free"
+    }
+  },
+  "dishes": {
+    "listTitle": "Dishes",
+    "detailsTitle": "Dish Details",
+    "createNew": "Create New Dish",
+    "editDish": "Edit Dish",
+    "notFound": "Dish not found",
+    "backToList": "Back to dish list",
+    "deleteConfirm": "Are you sure you want to delete this dish?",
+    "noDishesFound": "No dishes found matching your filters.",
+    "form": {
+      "name": "Dish Name",
+      "category": "Category",
+      "ingredients": "Ingredients",
+      "addIngredient": "Add Ingredient",
+      "weight": "Weight (g)",
+      "weightUnit": "g",
+      "ingredientsError": "Add at least one ingredient",
+      "addIngredientPrompt": "Start by adding some ingredients",
+      "moreIngredients": "more",
+      "backendCalculationNote": "Final values will be calculated by the server",
+      "photos": "Photos",
+      "searchPlaceholder": "Search dishes...",
+      "editorTipTitle": "Editor Tip",
+      "editorTipText": "Add various ingredients to make your dish balanced and tasty!"
+    },
+    "categories": {
+      "DESSERT": "Dessert",
+      "FIRST": "First",
+      "SECOND": "Second",
+      "DRINK": "Drink",
+      "SALAD": "Salad",
+      "SOUP": "Soup",
+      "SNACK": "Snack"
     }
   }
 }
