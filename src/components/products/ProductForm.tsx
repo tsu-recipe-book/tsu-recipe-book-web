@@ -313,7 +313,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 >
                   <X className="w-3 h-3" />
                 </button>
-                <div className="absolute bottom-0 left-0 right-0 bg-indigo-600 text-[8px] text-white text-center py-1 font-black uppercase tracking-widest">New Asset</div>
+                <div className="absolute bottom-0 left-0 right-0 bg-indigo-600 text-[8px] text-white text-center py-1 font-black uppercase tracking-widest">{t('products.form.newAsset')}</div>
               </div>
             ))}
             {existingPhotos.length + newFiles.length < 5 && (
@@ -350,10 +350,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
       {/* Sticky Preview Panel */}
       <div className="lg:col-span-5 sticky top-8 space-y-6">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest ml-1">Live Preview</h2>
+          <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest ml-1">{t('products.form.livePreview')}</h2>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-[10px] font-bold text-gray-500 uppercase">Updating</span>
+            <span className="text-[10px] font-bold text-gray-500 uppercase">{t('products.form.updating')}</span>
           </div>
         </div>
         
@@ -367,9 +367,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
 
         <div className="bg-indigo-900 rounded-3xl p-6 text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
-          <h4 className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">Editor Tip</h4>
+          <h4 className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">{t('products.form.editorTipTitle')}</h4>
           <p className="text-sm font-medium leading-relaxed opacity-90">
-            Ensure your photo is bright and clear. High-quality images significantly improve the appeal of your recipes!
+            {t('products.form.editorTipText')}
           </p>
         </div>
       </div>

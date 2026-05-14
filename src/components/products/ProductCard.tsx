@@ -45,7 +45,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, clas
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50">
             <div className="w-12 h-12 mb-2 opacity-20 border-2 border-current rounded-lg" />
-            <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">No Image</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">{t('products.info.noImage')}</span>
           </div>
         )}
         

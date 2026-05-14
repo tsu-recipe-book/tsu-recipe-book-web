@@ -43,7 +43,12 @@
       "create": "Create Product",
       "nameError": "Name must be at least 2 characters long",
       "nutritionError": "Sum of Protein, Fat, and Carbs cannot exceed 100g per 100g",
-      "searchPlaceholder": "Search products..."
+      "searchPlaceholder": "Search products...",
+      "livePreview": "Live Preview",
+      "updating": "Updating",
+      "newAsset": "New Asset",
+      "editorTipTitle": "Tip",
+      "editorTipText": "Ensure your photo is bright and clear. High-quality images significantly improve the appeal of your recipes!"
     },
     "filters": {
       "title": "Filters",
@@ -56,7 +61,8 @@
       "readyToEat": "Ready to Eat",
       "semiFinished": "Semi-Finished",
       "requiresCooking": "Requires Cooking",
-      "updatedAt": "Updated at: {{date}}"
+      "updatedAt": "Updated at: {{date}}",
+      "noImage": "No Image"
     },
     "categories": {
       "FROZEN": "Frozen",
