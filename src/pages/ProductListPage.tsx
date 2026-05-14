@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '../hooks/useProducts';
 import { Search, Filter, Plus } from 'lucide-react';
+import { ProductCard } from '../components/products/ProductCard';
 import type { ProductCategory, ProductStatus, ProductFlag } from '../types/api';
 import type { ProductFilters } from '../api/products';
 
@@ -185,42 +186,11 @@ const ProductListPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products?.map((product) => (
-            <div
-              key={product.id}
+            <ProductCard 
+              key={product.id} 
+              product={product} 
               onClick={() => navigate(`/products/${product.id}`)}
-              className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer"
-            >
-              <div className="aspect-video bg-gray-100 relative overflow-hidden">
-                {product.mainPhotoUrl ? (
-                  <img
-                    src={product.mainPhotoUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
-                )}
-                <div className="absolute top-2 right-2 flex flex-col gap-1">
-                  {product.flags.map(flag => (
-                    <span key={flag} className="px-2 py-0.5 text-[10px] font-bold bg-green-500 text-white rounded-full shadow-sm">
-                      {t(`products.flags.${flag}`)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{product.name}</h3>
-                  <span className="text-xs font-medium text-gray-500 bg-gray-50 px-2 py-1 rounded">{product.calories} {t('products.form.caloriesUnit')}</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold uppercase tracking-wider">{t(`products.categories.${product.category}`)}</span>
-                  <span className="px-2 py-1 bg-amber-50 text-amber-600 rounded text-[10px] font-bold uppercase tracking-wider">
-                    {product.cookingRequired === 'READY_TO_EAT' ? t('products.info.readyToEat') : product.cookingRequired === 'SEMI_FINISHED' ? t('products.info.semiFinished') : t('products.info.requiresCooking')}
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
           ))}
         </div>
       )}

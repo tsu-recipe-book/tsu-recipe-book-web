@@ -37,7 +37,7 @@ const ProductEditPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <button 
         onClick={() => navigate(-1)}
         className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors"
