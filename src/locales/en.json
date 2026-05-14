@@ -80,5 +80,33 @@
       "GLUTEN_FREE": "Gluten Free",
       "SUGAR_FREE": "Sugar Free"
     }
+  },
+  "dishes": {
+    "listTitle": "Dishes",
+    "detailsTitle": "Dish Details",
+    "createNew": "Create New Dish",
+    "editDish": "Edit Dish",
+    "notFound": "Dish not found",
+    "backToList": "Back to dish list",
+    "deleteConfirm": "Are you sure you want to delete this dish?",
+    "noDishesFound": "No dishes found matching your filters.",
+    "form": {
+      "name": "Dish Name",
+      "category": "Category",
+      "ingredients": "Ingredients",
+      "addIngredient": "Add Ingredient",
+      "weight": "Weight (g)",
+      "photos": "Photos",
+      "searchPlaceholder": "Search dishes..."
+    },
+    "categories": {
+      "DESSERT": "Dessert",
+      "FIRST": "First",
+      "SECOND": "Second",
+      "DRINK": "Drink",
+      "SALAD": "Salad",
+      "SOUP": "Soup",
+      "SNACK": "Snack"
+    }
   }
 }

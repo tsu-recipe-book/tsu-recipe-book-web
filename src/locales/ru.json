@@ -80,5 +80,33 @@
       "GLUTEN_FREE": "Без глютена",
       "SUGAR_FREE": "Без сахара"
     }
+  },
+  "dishes": {
+    "listTitle": "Блюда",
+    "detailsTitle": "Детали блюда",
+    "createNew": "Создать новое блюдо",
+    "editDish": "Редактировать блюдо",
+    "notFound": "Блюдо не найдено",
+    "backToList": "Вернуться к списку",
+    "deleteConfirm": "Вы уверены, что хотите удалить это блюдо?",
+    "noDishesFound": "Блюд по вашему запросу не найдено.",
+    "form": {
+      "name": "Название блюда",
+      "category": "Категория",
+      "ingredients": "Ингредиенты",
+      "addIngredient": "Добавить ингредиент",
+      "weight": "Вес (г)",
+      "photos": "Фотографии",
+      "searchPlaceholder": "Поиск блюд..."
+    },
+    "categories": {
+      "DESSERT": "Десерт",
+      "FIRST": "Первое",
+      "SECOND": "Второе",
+      "DRINK": "Напиток",
+      "SALAD": "Салат",
+      "SOUP": "Суп",
+      "SNACK": "Закуска"
+    }
   }
 }
