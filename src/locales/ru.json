@@ -104,7 +104,9 @@
       "moreIngredients": "еще",
       "backendCalculationNote": "Итоговые значения будут рассчитаны сервером",
       "photos": "Фотографии",
-      "searchPlaceholder": "Поиск блюд..."
+      "searchPlaceholder": "Поиск блюд...",
+      "editorTipTitle": "Совет",
+      "editorTipText": "Добавляйте разнообразные ингредиенты, чтобы сделать ваше блюдо сбалансированным и вкусным!"
     },
     "categories": {
       "DESSERT": "Десерт",

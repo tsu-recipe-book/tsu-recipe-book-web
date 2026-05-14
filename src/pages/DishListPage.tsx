@@ -71,7 +71,7 @@ const DishListPage: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={t('dishes.form.searchPlaceholder') || "Search dishes..."}
+              placeholder={t('dishes.form.searchPlaceholder')}
               value={filters.search}
               onChange={handleSearchChange}
               className="pl-12 pr-4 py-3 w-full border border-gray-100 bg-white rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all shadow-sm font-medium"

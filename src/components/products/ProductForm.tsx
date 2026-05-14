@@ -4,11 +4,7 @@ import {
   Plus,
   X,
   Flame,
-  Dna,
-  Droplets,
-  Carrot,
-  Image as ImageIcon,
-  Loader2
+  Image as ImageIcon
 } from 'lucide-react';
 import type {
   ProductDto,
@@ -30,7 +26,7 @@ const CATEGORIES: ProductCategory[] = [
   'GRAINS', 'CANNED', 'LIQUID', 'SWEETS'
 ];
 
-export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, isLoading }) => {
+export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit }) => {
   const { t } = useTranslation();
 
   const STATUSES: { value: ProductStatus; label: string }[] = [

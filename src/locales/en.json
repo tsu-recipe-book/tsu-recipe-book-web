@@ -104,7 +104,9 @@
       "moreIngredients": "more",
       "backendCalculationNote": "Final values will be calculated by the server",
       "photos": "Photos",
-      "searchPlaceholder": "Search dishes..."
+      "searchPlaceholder": "Search dishes...",
+      "editorTipTitle": "Editor Tip",
+      "editorTipText": "Add various ingredients to make your dish balanced and tasty!"
     },
     "categories": {
       "DESSERT": "Dessert",

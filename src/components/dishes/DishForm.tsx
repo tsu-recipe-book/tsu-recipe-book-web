@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Plus, 
@@ -6,7 +6,6 @@ import {
   Search,
   Utensils,
   ImageIcon,
-  Loader2,
   Scale,
   Trash2,
   Calculator
@@ -16,8 +15,7 @@ import type {
   DishDto, 
   DishCategory, 
   ProductListItem, 
-  ProductDto,
-  ProductFlag
+  ProductDto
 } from '../../types/api';
 import { cn } from '../../utils/cn';
 
@@ -36,7 +34,7 @@ interface SelectedIngredient {
   weight: number;
 }
 
-export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoading }) => {
+export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => {
   const { t } = useTranslation();
 
   const [name, setName] = useState(initialData?.name || '');
@@ -53,7 +51,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
   
   const [productSearch, setProductSearch] = useState('');
-  const { data: searchResults, isLoading: isSearching } = useProducts({ search: productSearch });
+  const { data: searchResults } = useProducts({ search: productSearch });
 
   const [error, setError] = useState<string | null>(null);
 
@@ -359,7 +357,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit, isLoa
 
         <div className="bg-indigo-900 rounded-3xl p-6 text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
-          <h4 className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">{t('products.form.editorTipTitle')}</h4>
+          <h4 className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">{t('dishes.form.editorTipTitle')}</h4>
           <p className="text-sm font-medium leading-relaxed opacity-90">
             {t('dishes.form.editorTipText')}
           </p>
