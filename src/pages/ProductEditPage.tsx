@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { productService } from '../api/products';
 import { ProductForm } from '../components/products/ProductForm';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -9,6 +10,7 @@ const ProductEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { data: product, isLoading: isFetching } = useQuery({
     queryKey: ['product', id],
@@ -29,7 +31,7 @@ const ProductEditPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-        <p className="text-gray-500 font-medium">Loading product details...</p>
+        <p className="text-gray-500 font-medium">{t('common.loading')}</p>
       </div>
     );
   }
@@ -41,12 +43,12 @@ const ProductEditPage: React.FC = () => {
         className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back
+        {t('common.back')}
       </button>
 
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900">Edit Product</h1>
-        <p className="text-gray-500 mt-2">Update information and nutrition details for {product?.name}.</p>
+        <h1 className="text-3xl font-extrabold text-gray-900">{t('products.editProduct')}</h1>
+        <p className="text-gray-500 mt-2">{product?.name}</p>
       </div>
 
       <ProductForm 

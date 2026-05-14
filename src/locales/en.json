@@ -1,0 +1,58 @@
+{
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "actions": "Actions"
+  },
+  "nav": {
+    "products": "Products",
+    "dishes": "Dishes",
+    "comingSoon": "Coming Soon"
+  },
+  "products": {
+    "listTitle": "Products",
+    "detailsTitle": "Product Details",
+    "createNew": "Create New Product",
+    "editProduct": "Edit Product",
+    "notFound": "Product not found",
+    "backToList": "Back to product list",
+    "deleteConfirm": "Are you sure you want to delete this product?",
+    "deleteError": "Cannot delete product. It might be used in dishes.",
+    "form": {
+      "name": "Product Name",
+      "category": "Category",
+      "status": "Status",
+      "dietaryFlags": "Dietary Flags",
+      "nutritionPer100g": "Nutrition per 100g",
+      "calories": "Calories",
+      "caloriesUnit": "kcal",
+      "protein": "Protein",
+      "fat": "Fat",
+      "carbs": "Carbs",
+      "photos": "Photos",
+      "addPhoto": "Add",
+      "saving": "Saving...",
+      "update": "Update Product",
+      "create": "Create Product",
+      "nameError": "Name must be at least 2 characters long",
+      "nutritionError": "Sum of Protein, Fat, and Carbs cannot exceed 100g per 100g",
+      "searchPlaceholder": "Search products..."
+    },
+    "filters": {
+      "title": "Filters",
+      "advanced": "Advanced Filters",
+      "reset": "Reset all"
+    },
+    "noProductsFound": "No products found matching your filters.",
+    "info": {
+      "category": "Category",
+      "readyToEat": "Ready to Eat",
+      "semiFinished": "Semi-Finished",
+      "requiresCooking": "Requires Cooking"
+    }
+  }
+}

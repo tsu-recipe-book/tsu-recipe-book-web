@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { productService } from '../api/products';
 import { 
   ArrowLeft, 
@@ -19,6 +20,7 @@ import { cn } from '../utils/cn';
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -27,12 +29,12 @@ const ProductDetailsPage: React.FC = () => {
   });
 
   const handleDelete = async () => {
-    if (!id || !window.confirm('Are you sure you want to delete this product?')) return;
+    if (!id || !window.confirm(t('products.deleteConfirm'))) return;
     try {
       await productService.deleteProduct(id);
       navigate('/products');
     } catch (err) {
-      alert('Cannot delete product. It might be used in dishes.');
+      alert(t('products.deleteError'));
     }
   };
 
@@ -55,19 +57,28 @@ const ProductDetailsPage: React.FC = () => {
   if (error || !product) return (
     <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
       <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-      <h2 className="text-xl font-bold text-gray-900">Product not found</h2>
+      <h2 className="text-xl font-bold text-gray-900">{t('products.notFound')}</h2>
       <button onClick={() => navigate('/products')} className="mt-4 text-indigo-600 font-medium hover:underline">
-        Back to product list
+        {t('products.backToList')}
       </button>
     </div>
   );
 
   const nutritionItems = [
-    { label: 'Calories', value: product.calories, unit: 'kcal', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: 'Proteins', value: product.protein, unit: 'g', icon: Dna, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Fats', value: product.fat, unit: 'g', icon: Droplets, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: 'Carbs', value: product.carbs, unit: 'g', icon: Carrot, color: 'text-green-500', bg: 'bg-green-50' },
+    { label: t('products.form.calories'), value: product.calories, unit: 'kcal', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: t('products.form.protein'), value: product.protein, unit: 'g', icon: Dna, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: t('products.form.fat'), value: product.fat, unit: 'g', icon: Droplets, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { label: t('products.form.carbs'), value: product.carbs, unit: 'g', icon: Carrot, color: 'text-green-500', bg: 'bg-green-50' },
   ];
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'READY_TO_EAT': return t('products.info.readyToEat');
+      case 'SEMI_FINISHED': return t('products.info.semiFinished');
+      case 'REQUIRES_COOKING': return t('products.info.requiresCooking');
+      default: return status;
+    }
+  };
 
   return (
     <div className="space-y-8 pb-12">
@@ -77,7 +88,7 @@ const ProductDetailsPage: React.FC = () => {
           className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Products
+          {t('common.back')}
         </button>
         <div className="flex items-center gap-3">
           <button 
@@ -85,20 +96,19 @@ const ProductDetailsPage: React.FC = () => {
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
           >
             <Edit className="w-4 h-4 mr-2" />
-            Edit
+            {t('common.edit')}
           </button>
           <button 
             onClick={handleDelete}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Delete
+            {t('common.delete')}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Gallery Section */}
         <div className="space-y-4">
           <div className="aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center">
             {product.photoUrls.length > 0 ? (
@@ -125,7 +135,6 @@ const ProductDetailsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Info Section */}
         <div className="space-y-8">
           <div>
             <div className="flex flex-wrap gap-2 mb-4">
@@ -146,7 +155,7 @@ const ProductDetailsPage: React.FC = () => {
                 product.cookingRequired === 'READY_TO_EAT' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
               )}>
                 <ChefHat className="w-4 h-4 mr-2" />
-                {product.cookingRequired.replace(/_/g, ' ')}
+                {getStatusLabel(product.cookingRequired)}
               </span>
             </div>
           </div>
@@ -159,17 +168,6 @@ const ProductDetailsPage: React.FC = () => {
                 <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">{item.label} ({item.unit})</div>
               </div>
             ))}
-          </div>
-
-          <div className="pt-8 border-t border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Product Information</h3>
-            <p className="text-gray-600 leading-relaxed">
-              This product belongs to the <span className="font-semibold">{product.category.toLowerCase()}</span> category. 
-              It is <span className="font-semibold text-gray-900">{product.cookingRequired.replace(/_/g, ' ').toLowerCase()}</span> and contains 
-              {product.flags.length > 0 
-                ? ` following dietary attributes: ${product.flags.map(f => f.toLowerCase().replace(/_/g, ' ')).join(', ')}.`
-                : ' no specific dietary flags.'}
-            </p>
           </div>
         </div>
       </div>

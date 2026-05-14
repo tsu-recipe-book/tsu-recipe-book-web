@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Plus, 
   X, 
@@ -28,15 +29,17 @@ const CATEGORIES: ProductCategory[] = [
   'GRAINS', 'CANNED', 'LIQUID', 'SWEETS'
 ];
 
-const STATUSES: { value: ProductStatus; label: string }[] = [
-  { value: 'READY_TO_EAT', label: 'Ready to Eat' },
-  { value: 'SEMI_FINISHED', label: 'Semi-Finished' },
-  { value: 'REQUIRES_COOKING', label: 'Requires Cooking' }
-];
-
-const FLAGS: ProductFlag[] = ['VEGAN', 'GLUTEN_FREE', 'SUGAR_FREE'];
-
 export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, isLoading }) => {
+  const { t } = useTranslation();
+  
+  const STATUSES: { value: ProductStatus; label: string }[] = [
+    { value: 'READY_TO_EAT', label: t('products.info.readyToEat') },
+    { value: 'SEMI_FINISHED', label: t('products.info.semiFinished') },
+    { value: 'REQUIRES_COOKING', label: t('products.info.requiresCooking') }
+  ];
+
+  const FLAGS: ProductFlag[] = ['VEGAN', 'GLUTEN_FREE', 'SUGAR_FREE'];
+
   const [name, setName] = useState(initialData?.name || '');
   const [category, setCategory] = useState<ProductCategory>(initialData?.category || 'VEGETABLES');
   const [cookingRequired, setCookingRequired] = useState<ProductStatus>(initialData?.cookingRequired || 'READY_TO_EAT');
@@ -61,8 +64,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
 
   const removeImage = (index: number) => {
     setPreviews(prev => prev.filter((_, i) => i !== index));
-    // If it's a new file, remove it from files array
-    // This is a simplified logic, in production you'd track indices better
     setFiles(prev => prev.filter((_, i) => i !== (index - (initialData?.photoUrls.length || 0))));
   };
 
@@ -78,12 +79,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
 
     // Validation
     if (name.length < 2) {
-      setError('Name must be at least 2 characters long');
+      setError(t('products.form.nameError'));
       return;
     }
 
     if (protein + fat + carbs > 100) {
-      setError('Sum of Protein, Fat, and Carbs cannot exceed 100g per 100g');
+      setError(t('products.form.nutritionError'));
       return;
     }
 
@@ -118,7 +119,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
         {/* Basic Info */}
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Product Name</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t('products.form.name')}</label>
             <input
               type="text"
               value={name}
@@ -131,7 +132,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">{t('products.form.category')}</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as ProductCategory)}
@@ -143,7 +144,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">{t('products.form.status')}</label>
               <select
                 value={cookingRequired}
                 onChange={e => setCookingRequired(e.target.value as ProductStatus)}
@@ -157,7 +158,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">Dietary Flags</label>
+            <label className="block text-sm font-bold text-gray-700 mb-3">{t('products.form.dietaryFlags')}</label>
             <div className="flex flex-wrap gap-2">
               {FLAGS.map(flag => (
                 <button
@@ -180,7 +181,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
 
         {/* Nutrition */}
         <div className="space-y-6">
-          <label className="block text-sm font-bold text-gray-700">Nutrition per 100g</label>
+          <label className="block text-sm font-bold text-gray-700">{t('products.form.nutritionPer100g')}</label>
           <div className="grid grid-cols-2 gap-4">
             <div className="relative">
               <Flame className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
@@ -189,7 +190,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 value={calories}
                 onChange={e => setCalories(Number(e.target.value))}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none"
-                placeholder="Calories"
+                placeholder={t('products.form.calories')}
               />
             </div>
             <div className="relative">
@@ -199,7 +200,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 value={protein}
                 onChange={e => setProtein(Number(e.target.value))}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="Protein"
+                placeholder={t('products.form.protein')}
               />
             </div>
             <div className="relative">
@@ -209,7 +210,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 value={fat}
                 onChange={e => setFat(Number(e.target.value))}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none"
-                placeholder="Fat"
+                placeholder={t('products.form.fat')}
               />
             </div>
             <div className="relative">
@@ -219,14 +220,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 value={carbs}
                 onChange={e => setCarbs(Number(e.target.value))}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 outline-none"
-                placeholder="Carbs"
+                placeholder={t('products.form.carbs')}
               />
             </div>
           </div>
 
           {/* Images */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">Photos</label>
+            <label className="block text-sm font-bold text-gray-700 mb-3">{t('products.form.photos')}</label>
             <div className="grid grid-cols-4 gap-4">
               {previews.map((url, i) => (
                 <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-gray-100 group">
@@ -243,7 +244,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
               {previews.length < 5 && (
                 <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-all text-gray-400">
                   <ImageIcon className="w-6 h-6 mb-1" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider">Add</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider">{t('products.form.addPhoto')}</span>
                   <input type="file" multiple accept="image/*" onChange={handleFileChange} className="hidden" />
                 </label>
               )}
@@ -261,12 +262,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
+              {t('products.form.saving')}
             </>
           ) : (
             <>
               <Plus className="w-4 h-4 mr-2" />
-              {initialData ? 'Update Product' : 'Create Product'}
+              {initialData ? t('products.form.update') : t('products.form.create')}
             </>
           )}
         </button>
@@ -274,3 +275,4 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
     </form>
   );
 };
+
