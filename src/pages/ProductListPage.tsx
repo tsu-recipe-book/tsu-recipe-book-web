@@ -186,7 +186,11 @@ const ProductListPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products?.map((product) => (
-            <div key={product.id} className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300">
+            <div 
+              key={product.id} 
+              onClick={() => navigate(`/products/${product.id}`)}
+              className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer"
+            >
               <div className="aspect-video bg-gray-100 relative overflow-hidden">
                 {product.mainPhotoUrl ? (
                   <img 

@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProductListPage from './pages/ProductListPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import ProductCreatePage from './pages/ProductCreatePage';
 
 function App() {
   return (
@@ -8,7 +10,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center space-x-8">
-              <div className="flex-shrink-0 flex items-center">
+              <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => window.location.href = '/'}>
                 <span className="text-xl font-bold text-indigo-600">RecipeBook</span>
               </div>
               <div className="flex space-x-4">
@@ -28,6 +30,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/products" replace />} />
           <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/new" element={<ProductCreatePage />} />
+          <Route path="/products/:id" element={<ProductDetailsPage />} />
           <Route path="/dishes" element={<div>Dishes List (Coming Soon)</div>} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
