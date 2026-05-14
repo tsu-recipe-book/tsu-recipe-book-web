@@ -135,7 +135,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-      <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-8">
+      <form id="product-form" onSubmit={handleSubmit} className="lg:col-span-7 space-y-8">
         {error && (
           <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-medium animate-in fade-in slide-in-from-top-2">
             {error}
@@ -326,25 +326,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
           </div>
         </div>
 
-        <div className="flex justify-end pt-4">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="group px-10 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                {t('products.form.saving')}
-              </>
-            ) : (
-              <>
-                <Plus className="w-5 h-5 mr-3 group-hover:rotate-90 transition-transform" />
-                {initialData ? t('products.form.update') : t('products.form.create')}
-              </>
-            )}
-          </button>
-        </div>
       </form>
 
       {/* Sticky Preview Panel */}
