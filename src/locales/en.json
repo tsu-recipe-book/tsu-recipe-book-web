@@ -35,6 +35,7 @@
       "fat": "Fat",
       "carbs": "Carbs",
       "composition": "Composition",
+      "compositionPlaceholder": "e.g. Flour, sugar, eggs...",
       "photos": "Photos",
       "addPhoto": "Add",
       "saving": "Saving...",

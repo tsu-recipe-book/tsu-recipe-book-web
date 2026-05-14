@@ -35,6 +35,7 @@
       "fat": "Жиры",
       "carbs": "Углеводы",
       "composition": "Состав",
+      "compositionPlaceholder": "напр. Мука, сахар, яйца...",
       "photos": "Фотографии",
       "addPhoto": "Добавить",
       "saving": "Сохранение...",
