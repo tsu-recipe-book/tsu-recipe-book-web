@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Flame } from 'lucide-react';
 import type { ProductListItem, ProductFlag, ProductCategory, ProductStatus } from '../../types/api';
 import { cn } from '../../utils/cn';
+import { getImageUrl } from '../../utils/imageUrl';
 
 interface ProductCardProps {
   product: Partial<ProductListItem> & { 
@@ -36,9 +37,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, clas
       )}
     >
       <div className="aspect-[4/3] bg-gray-50 relative overflow-hidden">
-        {product.mainPhotoUrl ? (
+        {getImageUrl(product.mainPhoto || (product as any).photos?.[0]) ? (
           <img
-            src={product.mainPhotoUrl}
+            src={getImageUrl(product.mainPhoto || (product as any).photos?.[0])}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
           />

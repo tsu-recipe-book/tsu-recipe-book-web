@@ -16,6 +16,7 @@ import {
   Edit
 } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { getImageUrl } from '../utils/imageUrl';
 
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -117,7 +118,7 @@ const ProductDetailsPage: React.FC = () => {
           <div className="aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center">
             {product.photos.length > 0 ? (
               <img 
-                src={product.photos[0]} 
+                src={getImageUrl(product.photos[0])} 
                 alt={product.name} 
                 className="w-full h-full object-cover"
               />
@@ -132,7 +133,7 @@ const ProductDetailsPage: React.FC = () => {
             <div className="grid grid-cols-4 gap-4">
               {product.photos.slice(1, 5).map((url, i) => (
                 <div key={i} className="aspect-square rounded-xl overflow-hidden border border-gray-100 shadow-sm">
-                  <img src={url} alt={`${product.name} ${i + 2}`} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(url)} alt={`${product.name} ${i + 2}`} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

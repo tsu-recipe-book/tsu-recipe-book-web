@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { getImageUrl } from '../utils/imageUrl';
 
 const DishDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -101,7 +102,7 @@ const DishDetailsPage: React.FC = () => {
           <div className="aspect-square bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center relative">
             {dish.photos.length > 0 ? (
               <img 
-                src={dish.photos[0]} 
+                src={getImageUrl(dish.photos[0])} 
                 alt={dish.name} 
                 className="w-full h-full object-cover"
               />
@@ -116,7 +117,7 @@ const DishDetailsPage: React.FC = () => {
             <div className="grid grid-cols-4 gap-4">
               {dish.photos.slice(1, 5).map((url, i) => (
                 <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-                  <img src={url} alt={`${dish.name} ${i + 2}`} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(url)} alt={`${dish.name} ${i + 2}`} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

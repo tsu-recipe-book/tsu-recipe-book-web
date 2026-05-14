@@ -35,7 +35,7 @@ export interface ProductListItem {
   cookingRequired: ProductStatus;
   calories: number;
   flags: ProductFlag[];
-  mainPhotoUrl?: string;
+  mainPhoto?: string;
 }
 
 export type DishCategory =
@@ -73,5 +73,5 @@ export interface DishListItem {
   category: DishCategory;
   calories: number;
   flags: ProductFlag[];
-  mainPhotoUrl?: string;
+  mainPhoto?: string;
 }
