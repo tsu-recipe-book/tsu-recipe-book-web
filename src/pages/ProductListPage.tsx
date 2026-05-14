@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useProducts } from '../hooks/useProducts';
 import { Search, Filter, Plus } from 'lucide-react';
 import type { ProductCategory, ProductStatus, ProductFlag } from '../types/api';
@@ -9,16 +10,18 @@ const CATEGORIES: ProductCategory[] = [
   'FROZEN', 'MEAT', 'VEGETABLES', 'GREENS', 'SPICES', 'GRAINS', 'CANNED', 'LIQUID', 'SWEETS'
 ];
 
-const COOKING_STATUSES: ProductStatus[] = [
-  'READY_TO_EAT', 'SEMI_FINISHED', 'REQUIRES_COOKING'
-];
-
-const FLAGS: ProductFlag[] = [
-  'VEGAN', 'GLUTEN_FREE', 'SUGAR_FREE'
-];
-
 const ProductListPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const COOKING_STATUSES: ProductStatus[] = [
+    'READY_TO_EAT', 'SEMI_FINISHED', 'REQUIRES_COOKING'
+  ];
+
+  const FLAGS: ProductFlag[] = [
+    'VEGAN', 'GLUTEN_FREE', 'SUGAR_FREE'
+  ];
+
   const [filters, setFilters] = useState<ProductFilters>({
     search: '',
     category: undefined,
@@ -52,18 +55,18 @@ const ProductListPage: React.FC = () => {
     });
   };
 
-  if (error) return <div className="text-red-500 p-10">Error loading products</div>;
+  if (error) return <div className="text-red-500 p-10">{t('common.errorLoading')}</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('products.listTitle')}</h1>
         <button 
           onClick={() => navigate('/products/new')}
           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Product
+          {t('products.createNew')}
         </button>
       </div>
 
@@ -73,7 +76,7 @@ const ProductListPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t('products.form.searchPlaceholder') || "Search products..."}
               value={filters.search}
               onChange={handleSearchChange}
               className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
@@ -82,13 +85,13 @@ const ProductListPage: React.FC = () => {
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className={`inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
-              isFilterOpen || (filters.category || filters.cookingRequired || filters.flags?.length)
+              isFilterOpen || (filters.category || filters.cookingRequired || (filters.flags?.length ?? 0) > 0)
                 ? 'border-indigo-600 text-indigo-600 bg-indigo-50'
                 : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
             }`}
           >
             <Filter className="w-4 h-4 mr-2" />
-            Filters
+            {t('products.filters.title')}
             {(filters.category || filters.cookingRequired || (filters.flags?.length ?? 0) > 0) && (
               <span className="ml-2 w-2 h-2 bg-indigo-600 rounded-full"></span>
             )}
@@ -98,15 +101,15 @@ const ProductListPage: React.FC = () => {
         {isFilterOpen && (
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="font-semibold text-gray-900">Advanced Filters</h2>
+              <h2 className="font-semibold text-gray-900">{t('products.filters.advanced')}</h2>
               <button onClick={clearFilters} className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-                Reset all
+                {t('products.filters.reset')}
               </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('products.form.category')}</label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map(cat => (
                     <button
@@ -125,7 +128,7 @@ const ProductListPage: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Cooking Required</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('products.form.status')}</label>
                 <div className="flex flex-wrap gap-2">
                   {COOKING_STATUSES.map(status => (
                     <button
@@ -137,14 +140,14 @@ const ProductListPage: React.FC = () => {
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      {status.replace(/_/g, ' ')}
+                      {status === 'READY_TO_EAT' ? t('products.info.readyToEat') : status === 'SEMI_FINISHED' ? t('products.info.semiFinished') : t('products.info.requiresCooking')}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Dietary Flags</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('products.form.dietaryFlags')}</label>
                 <div className="flex flex-wrap gap-2">
                   {FLAGS.map(flag => (
                     <button
@@ -180,8 +183,8 @@ const ProductListPage: React.FC = () => {
         </div>
       ) : products?.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
-          <p className="text-gray-500">No products found matching your filters.</p>
-          <button onClick={clearFilters} className="mt-2 text-indigo-600 font-medium">Clear all filters</button>
+          <p className="text-gray-500">{t('products.noProductsFound')}</p>
+          <button onClick={clearFilters} className="mt-2 text-indigo-600 font-medium">{t('products.filters.reset')}</button>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -212,11 +215,13 @@ const ProductListPage: React.FC = () => {
               <div className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{product.name}</h3>
-                  <span className="text-xs font-medium text-gray-500 bg-gray-50 px-2 py-1 rounded">{product.calories} kcal</span>
+                  <span className="text-xs font-medium text-gray-500 bg-gray-50 px-2 py-1 rounded">{product.calories} {t('products.form.caloriesUnit')}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold uppercase tracking-wider">{product.category}</span>
-                  <span className="px-2 py-1 bg-amber-50 text-amber-600 rounded text-[10px] font-bold uppercase tracking-wider">{product.cookingRequired.replace(/_/g, ' ')}</span>
+                  <span className="px-2 py-1 bg-amber-50 text-amber-600 rounded text-[10px] font-bold uppercase tracking-wider">
+                    {product.cookingRequired === 'READY_TO_EAT' ? t('products.info.readyToEat') : product.cookingRequired === 'SEMI_FINISHED' ? t('products.info.semiFinished') : t('products.info.requiresCooking')}
+                  </span>
                 </div>
               </div>
             </div>
