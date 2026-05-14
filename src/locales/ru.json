@@ -24,6 +24,7 @@
     "deleteError": "Не удалось удалить продукт. Возможно, он используется в блюдах.",
     "form": {
       "name": "Название продукта",
+      "namePlaceholder": "напр. Куриная грудка",
       "category": "Категория",
       "status": "Статус",
       "dietaryFlags": "Диетические метки",
@@ -53,6 +54,22 @@
       "readyToEat": "Готов к употреблению",
       "semiFinished": "Полуфабрикат",
       "requiresCooking": "Требует приготовления"
+    },
+    "categories": {
+      "FROZEN": "Заморозка",
+      "MEAT": "Мясо",
+      "VEGETABLES": "Овощи",
+      "GREENS": "Зелень",
+      "SPICES": "Специи",
+      "GRAINS": "Крупы",
+      "CANNED": "Консервы",
+      "LIQUID": "Жидкости",
+      "SWEETS": "Сладости"
+    },
+    "flags": {
+      "VEGAN": "Веган",
+      "GLUTEN_FREE": "Без глютена",
+      "SUGAR_FREE": "Без сахара"
     }
   }
 }

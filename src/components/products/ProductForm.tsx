@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Plus, 
-  X, 
-  Flame, 
-  Dna, 
-  Droplets, 
-  Carrot, 
+import {
+  Plus,
+  X,
+  Flame,
+  Dna,
+  Droplets,
+  Carrot,
   Image as ImageIcon,
   Loader2
 } from 'lucide-react';
-import type { 
-  ProductDto, 
-  ProductCategory, 
-  ProductStatus, 
-  ProductFlag 
+import type {
+  ProductDto,
+  ProductCategory,
+  ProductStatus,
+  ProductFlag
 } from '../../types/api';
 import { cn } from '../../utils/cn';
 
@@ -25,13 +25,13 @@ interface ProductFormProps {
 }
 
 const CATEGORIES: ProductCategory[] = [
-  'FROZEN', 'MEAT', 'VEGETABLES', 'GREENS', 'SPICES', 
+  'FROZEN', 'MEAT', 'VEGETABLES', 'GREENS', 'SPICES',
   'GRAINS', 'CANNED', 'LIQUID', 'SWEETS'
 ];
 
 export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, isLoading }) => {
   const { t } = useTranslation();
-  
+
   const STATUSES: { value: ProductStatus; label: string }[] = [
     { value: 'READY_TO_EAT', label: t('products.info.readyToEat') },
     { value: 'SEMI_FINISHED', label: t('products.info.semiFinished') },
@@ -56,7 +56,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
       setFiles(prev => [...prev, ...newFiles]);
-      
+
       const newPreviews = newFiles.map(file => URL.createObjectURL(file));
       setPreviews(prev => [...prev, ...newPreviews]);
     }
@@ -68,7 +68,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
   };
 
   const toggleFlag = (flag: ProductFlag) => {
-    setSelectedFlags(prev => 
+    setSelectedFlags(prev =>
       prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag]
     );
   };
@@ -96,7 +96,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
     formData.append('protein', protein.toString());
     formData.append('fat', fat.toString());
     formData.append('carbs', carbs.toString());
-    
+
     selectedFlags.forEach(flag => formData.append('flags', flag));
     files.forEach(file => formData.append('files', file));
 
@@ -125,7 +125,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
               value={name}
               onChange={e => setName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-              placeholder="e.g. Chicken Breast"
+              placeholder={t('products.form.namePlaceholder')}
               required
             />
           </div>
@@ -139,7 +139,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none appearance-none bg-white"
               >
                 {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat.charAt(0) + cat.slice(1).toLowerCase()}</option>
+                  <option key={cat} value={cat}>{t(`products.categories.${cat}`)}</option>
                 ))}
               </select>
             </div>
@@ -172,7 +172,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                       : "bg-white border-gray-200 text-gray-500 hover:border-indigo-300"
                   )}
                 >
-                  {flag.replace(/_/g, ' ')}
+                  {t(`products.flags.${flag}`)}
                 </button>
               ))}
             </div>

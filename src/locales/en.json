@@ -24,6 +24,7 @@
     "deleteError": "Cannot delete product. It might be used in dishes.",
     "form": {
       "name": "Product Name",
+      "namePlaceholder": "e.g. Chicken Breast",
       "category": "Category",
       "status": "Status",
       "dietaryFlags": "Dietary Flags",
@@ -53,6 +54,22 @@
       "readyToEat": "Ready to Eat",
       "semiFinished": "Semi-Finished",
       "requiresCooking": "Requires Cooking"
+    },
+    "categories": {
+      "FROZEN": "Frozen",
+      "MEAT": "Meat",
+      "VEGETABLES": "Vegetables",
+      "GREENS": "Greens",
+      "SPICES": "Spices",
+      "GRAINS": "Grains",
+      "CANNED": "Canned",
+      "LIQUID": "Liquid",
+      "SWEETS": "Sweets"
+    },
+    "flags": {
+      "VEGAN": "Vegan",
+      "GLUTEN_FREE": "Gluten Free",
+      "SUGAR_FREE": "Sugar Free"
     }
   }
 }
