@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Flame, Utensils } from 'lucide-react';
 import type { DishListItem, DishCategory, ProductFlag } from '../../types/api';
 import { cn } from '../../utils/cn';
+import { getImageUrl } from '../../utils/imageUrl';
 
 interface DishCardProps {
   dish: Partial<DishListItem> & {
@@ -26,9 +27,9 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onClick, className }) 
       )}
     >
       <div className="aspect-[4/3] bg-gray-50 relative overflow-hidden">
-        {dish.mainPhotoUrl ? (
+        {getImageUrl(dish.mainPhoto || (dish as any).photos?.[0]) ? (
           <img
-            src={dish.mainPhotoUrl}
+            src={getImageUrl(dish.mainPhoto || (dish as any).photos?.[0])}
             alt={dish.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
           />

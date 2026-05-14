@@ -13,6 +13,7 @@ import type {
   ProductFlag
 } from '../../types/api';
 import { cn } from '../../utils/cn';
+import { getImageUrl } from '../../utils/imageUrl';
 import { ProductCard } from './ProductCard';
 
 interface ProductFormProps {
@@ -126,7 +127,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit 
     category,
     cookingRequired,
     flags: selectedFlags,
-    mainPhotoUrl: newPreviews[0] || existingPhotos[0]
+    mainPhoto: newPreviews[0] || existingPhotos[0]
   };
 
   return (
@@ -289,7 +290,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
             {existingPhotos.map((url, i) => (
               <div key={`existing-${i}`} className="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 group shadow-sm">
-                <img src={url} alt="Existing" className="w-full h-full object-cover" />
+                <img src={getImageUrl(url)} alt="Existing" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => removeExistingPhoto(i)}
