@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Plus, 
-  X, 
+import {
+  Plus,
+  X,
   Search,
   Utensils,
   ImageIcon,
@@ -11,11 +11,12 @@ import {
   Calculator
 } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
-import type { 
-  DishDto, 
-  DishCategory, 
-  ProductListItem, 
-  ProductDto
+import type {
+  DishDto,
+  DishCategory,
+  ProductListItem,
+  ProductDto,
+  ProductFlag
 } from '../../types/api';
 import { cn } from '../../utils/cn';
 import { getImageUrl } from '../../utils/imageUrl';
@@ -29,6 +30,8 @@ interface DishFormProps {
 const CATEGORIES: DishCategory[] = [
   'DESSERT', 'FIRST', 'SECOND', 'DRINK', 'SALAD', 'SOUP', 'SNACK'
 ];
+
+const FLAGS: ProductFlag[] = ['VEGAN', 'GLUTEN_FREE', 'SUGAR_FREE'];
 
 interface SelectedIngredient {
   product: ProductListItem | ProductDto;
@@ -47,10 +50,18 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
     })) || []
   );
 
+  const [selectedFlags, setSelectedFlags] = useState<ProductFlag[]>(initialData?.flags || []);
+
+  const [manualCalories, setManualCalories] = useState<string>(initialData?.calories !== undefined ? String(initialData.calories) : '');
+  const [manualProteins, setManualProteins] = useState<string>(initialData?.proteins !== undefined ? String(initialData.proteins) : '');
+  const [manualFats, setManualFats] = useState<string>(initialData?.fats !== undefined ? String(initialData.fats) : '');
+  const [manualCarbs, setManualCarbs] = useState<string>(initialData?.carbohydrates !== undefined ? String(initialData.carbohydrates) : '');
+  const [manualPortion, setManualPortion] = useState<string>(initialData?.portionSize !== undefined ? String(initialData.portionSize) : '');
+
   const [existingPhotos, setExistingPhotos] = useState<string[]>(initialData?.photos || []);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
-  
+
   const [productSearch, setProductSearch] = useState('');
   const { data: searchResults } = useProducts({ search: productSearch });
 
@@ -60,7 +71,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setNewFiles(prev => [...prev, ...files]);
-      
+
       const previews = files.map(file => URL.createObjectURL(file));
       setNewPreviews(prev => [...prev, ...previews]);
     }
@@ -82,7 +93,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
   };
 
   const updateWeight = (productId: string, weight: number) => {
-    setSelectedIngredients(prev => prev.map(ing => 
+    setSelectedIngredients(prev => prev.map(ing =>
       ing.product.id === productId ? { ...ing, weight } : ing
     ));
   };
@@ -105,16 +116,24 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
     const formData = new FormData();
     formData.append('name', name);
     formData.append('category', category);
-    
+
     // Format ingredients for backend: productId:weight
     selectedIngredients.forEach((ing, index) => {
       formData.append(`ingredients[${index}].productId`, ing.product.id);
       formData.append(`ingredients[${index}].weight`, ing.weight.toString());
     });
 
+    selectedFlags.forEach(flag => formData.append('flags', flag));
+
     newFiles.forEach(file => {
       formData.append('photos', file);
     });
+
+    if (manualCalories) formData.append('calories', manualCalories);
+    if (manualProteins) formData.append('proteins', manualProteins);
+    if (manualFats) formData.append('fats', manualFats);
+    if (manualCarbs) formData.append('carbohydrates', manualCarbs);
+    if (manualPortion) formData.append('portionSize', manualPortion);
 
     if (initialData) {
       existingPhotos.forEach(url => formData.append('photosToKeep', url));
@@ -174,6 +193,29 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                     )}
                   >
                     {t(`dishes.categories.${cat}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t('products.form.dietaryFlags')}</label>
+              <div className="flex flex-wrap gap-2">
+                {FLAGS.map(flag => (
+                  <button
+                    key={flag}
+                    type="button"
+                    onClick={() => setSelectedFlags(prev =>
+                      prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag]
+                    )}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-300",
+                      selectedFlags.includes(flag)
+                        ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200/50 scale-105"
+                        : "bg-white border-gray-100 text-gray-500 hover:border-emerald-200 hover:bg-emerald-50"
+                    )}
+                  >
+                    {t(`products.flags.${flag}`)}
                   </button>
                 ))}
               </div>
@@ -255,6 +297,74 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
           </div>
         </div>
 
+        {/* Section: Manual Nutrition Override */}
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+                <Calculator className="w-4 h-4 text-orange-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">{t('dishes.form.manualOverrideTitle')}</h2>
+                <p className="text-xs font-medium text-gray-400 mt-0.5">{t('dishes.form.manualOverrideDescription')}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t('products.form.calories')}</label>
+              <input
+                type="number" step="0.1" min="0"
+                value={manualCalories}
+                onChange={e => setManualCalories(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
+                placeholder={t('dishes.form.calculatedAuto')}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t('products.form.protein')}</label>
+              <input
+                type="number" step="0.1" min="0"
+                value={manualProteins}
+                onChange={e => setManualProteins(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
+                placeholder={t('dishes.form.calculatedAuto')}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t('products.form.fat')}</label>
+              <input
+                type="number" step="0.1" min="0"
+                value={manualFats}
+                onChange={e => setManualFats(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
+                placeholder={t('dishes.form.calculatedAuto')}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t('products.form.carbs')}</label>
+              <input
+                type="number" step="0.1" min="0"
+                value={manualCarbs}
+                onChange={e => setManualCarbs(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
+                placeholder={t('dishes.form.calculatedAuto')}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t('dishes.form.portionSize')}</label>
+              <input
+                type="number" step="0.1" min="0"
+                value={manualPortion}
+                onChange={e => setManualPortion(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
+                placeholder={t('dishes.form.calculatedAuto')}
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Section: Assets */}
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
           <div className="flex items-center gap-3 mb-2">
@@ -310,15 +420,20 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
             <span className="text-[10px] font-bold text-gray-500 uppercase">{t('products.form.updating')}</span>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-2xl p-8 space-y-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-50" />
-          
+
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-purple-100/50">
                 {t(`dishes.categories.${category}`)}
               </span>
+              {selectedFlags.map(flag => (
+                <span key={flag} className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-100/50">
+                  {t(`products.flags.${flag}`)}
+                </span>
+              ))}
             </div>
             <h3 className="text-3xl font-black text-gray-900 leading-tight">
               {name || <span className="text-gray-200">{t('products.form.namePlaceholder')}</span>}
@@ -346,13 +461,23 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
           </div>
 
           <div className="pt-6 border-t border-gray-50 flex items-center gap-4">
-             <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shrink-0">
-               <Calculator className="w-6 h-6 text-orange-500" />
-             </div>
-             <div>
-               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('products.form.nutritionPer100g')}</p>
-               <p className="text-sm font-bold text-gray-600 italic">{t('dishes.form.backendCalculationNote')}</p>
-             </div>
+            <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shrink-0">
+              <Calculator className="w-6 h-6 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('products.form.nutritionPer100g')}</p>
+              {manualCalories || manualProteins || manualFats || manualCarbs || manualPortion ? (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                  {manualCalories && <div><span className="text-sm font-black text-gray-900">{manualCalories}</span> <span className="text-[10px] font-bold text-gray-500 uppercase">kcal</span></div>}
+                  {manualProteins && <div><span className="text-sm font-black text-gray-900">{manualProteins}</span> <span className="text-[10px] font-bold text-gray-500 uppercase">P</span></div>}
+                  {manualFats && <div><span className="text-sm font-black text-gray-900">{manualFats}</span> <span className="text-[10px] font-bold text-gray-500 uppercase">F</span></div>}
+                  {manualCarbs && <div><span className="text-sm font-black text-gray-900">{manualCarbs}</span> <span className="text-[10px] font-bold text-gray-500 uppercase">C</span></div>}
+                  {manualPortion && <div><span className="text-sm font-black text-gray-900">{manualPortion}</span> <span className="text-[10px] font-bold text-gray-500 uppercase">g</span></div>}
+                </div>
+              ) : (
+                <p className="text-sm font-bold text-gray-600 italic">{t('dishes.form.backendCalculationNote')}</p>
+              )}
+            </div>
           </div>
         </div>
 

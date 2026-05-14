@@ -34,6 +34,9 @@ export interface ProductListItem {
   category: ProductCategory;
   cookingRequired: ProductStatus;
   calories: number;
+  proteins: number;
+  fats: number;
+  carbohydrates: number;
   flags: ProductFlag[];
   mainPhoto?: string;
 }
@@ -62,6 +65,7 @@ export interface DishDto {
   fats: number;
   carbohydrates: number;
   calories: number;
+  portionSize: number;
   flags: ProductFlag[];
   photos: string[];
   updatedAt: string;
@@ -72,6 +76,10 @@ export interface DishListItem {
   name: string;
   category: DishCategory;
   calories: number;
+  proteins: number;
+  fats: number;
+  carbohydrates: number;
+  portionSize: number;
   flags: ProductFlag[];
   mainPhoto?: string;
 }
