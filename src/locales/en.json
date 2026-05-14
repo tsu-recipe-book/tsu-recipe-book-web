@@ -34,6 +34,7 @@
       "protein": "Protein",
       "fat": "Fat",
       "carbs": "Carbs",
+      "composition": "Composition",
       "photos": "Photos",
       "addPhoto": "Add",
       "saving": "Saving...",
@@ -53,7 +54,8 @@
       "category": "Category",
       "readyToEat": "Ready to Eat",
       "semiFinished": "Semi-Finished",
-      "requiresCooking": "Requires Cooking"
+      "requiresCooking": "Requires Cooking",
+      "updatedAt": "Updated at: {{date}}"
     },
     "categories": {
       "FROZEN": "Frozen",

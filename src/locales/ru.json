@@ -34,6 +34,7 @@
       "protein": "Белки",
       "fat": "Жиры",
       "carbs": "Углеводы",
+      "composition": "Состав",
       "photos": "Фотографии",
       "addPhoto": "Добавить",
       "saving": "Сохранение...",
@@ -53,7 +54,8 @@
       "category": "Категория",
       "readyToEat": "Готов к употреблению",
       "semiFinished": "Полуфабрикат",
-      "requiresCooking": "Требует приготовления"
+      "requiresCooking": "Требует приготовления",
+      "updatedAt": "Обновлено: {{date}}"
     },
     "categories": {
       "FROZEN": "Заморозка",

@@ -18,12 +18,14 @@ export interface ProductDto {
   name: string;
   category: ProductCategory;
   cookingRequired: ProductStatus;
-  protein: number;
-  fat: number;
-  carbs: number;
+  proteins: number;
+  fats: number;
+  carbohydrates: number;
   calories: number;
+  composition: string;
   flags: ProductFlag[];
-  photoUrls: string[];
+  photos: string[];
+  updatedAt: string;
 }
 
 export interface ProductListItem {
