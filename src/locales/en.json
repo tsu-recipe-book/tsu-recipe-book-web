@@ -8,6 +8,9 @@
     "cancel": "Cancel",
     "actions": "Actions",
     "error": "An error occurred",
+    "errorTitle": "Oops! Something went wrong",
+    "errorLoading": "Failed to load data",
+    "retry": "Try again",
     "notFound": "Page not found"
   },
   "nav": {

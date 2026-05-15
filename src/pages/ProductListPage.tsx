@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useProducts } from '../hooks/useProducts';
 import { Search, Filter, Plus } from 'lucide-react';
 import { ProductCard } from '../components/products/ProductCard';
+import { ErrorState } from '../components/ui/ErrorState';
 import type { ProductCategory, ProductStatus, ProductFlag } from '../types/api';
 import type { ProductFilters } from '../api/products';
 
@@ -31,7 +32,7 @@ const ProductListPage: React.FC = () => {
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const { data: products, isLoading, error } = useProducts(filters);
+  const { data: products, isLoading, error, refetch } = useProducts(filters);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters(prev => ({ ...prev, search: e.target.value }));
@@ -56,7 +57,11 @@ const ProductListPage: React.FC = () => {
     });
   };
 
-  if (error) return <div className="text-red-500 p-10">{t('common.errorLoading')}</div>;
+  if (error) return (
+    <div className="pt-10">
+      <ErrorState onRetry={() => refetch()} />
+    </div>
+  );
 
   return (
     <div className="space-y-6">

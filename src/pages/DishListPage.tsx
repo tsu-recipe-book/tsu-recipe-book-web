@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDishes } from '../hooks/useDishes';
 import { Search, Filter, Plus } from 'lucide-react';
 import { DishCard } from '../components/dishes/DishCard';
+import { ErrorState } from '../components/ui/ErrorState';
 import type { DishCategory, ProductFlag } from '../types/api';
 import type { DishFilters } from '../api/dishes';
 
@@ -26,7 +27,7 @@ const DishListPage: React.FC = () => {
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const { data: dishes, isLoading, error } = useDishes(filters);
+  const { data: dishes, isLoading, error, refetch } = useDishes(filters);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters(prev => ({ ...prev, search: e.target.value }));
@@ -50,7 +51,11 @@ const DishListPage: React.FC = () => {
     });
   };
 
-  if (error) return <div className="text-red-500 p-10">{t('common.errorLoading')}</div>;
+  if (error) return (
+    <div className="pt-10">
+      <ErrorState onRetry={() => refetch()} />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
