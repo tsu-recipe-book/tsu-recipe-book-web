@@ -25,6 +25,7 @@ export interface ProductDto {
   composition: string;
   flags: ProductFlag[];
   photos: string[];
+  createdAt: string;
   updatedAt: string;
 }
 
@@ -85,7 +86,9 @@ export interface DishDto {
   calories: number;
   portionSize: number;
   flags: ProductFlag[];
+  availableFlags?: ProductFlag[];
   photos: string[];
+  createdAt: string;
   updatedAt: string;
 }
 
