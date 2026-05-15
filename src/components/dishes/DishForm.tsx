@@ -144,20 +144,30 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
     setNewPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  const clearManualMacros = () => {
+    setManualCalories('');
+    setManualProteins('');
+    setManualFats('');
+    setManualCarbs('');
+  };
+
   const addIngredient = (product: ProductListItem) => {
     if (selectedIngredients.some(ing => ing.product.id === product.id)) return;
     setSelectedIngredients(prev => [...prev, { product, weight: 100 }]);
     setProductSearch('');
+    clearManualMacros();
   };
 
   const updateWeight = (productId: string, weight: number) => {
     setSelectedIngredients(prev => prev.map(ing =>
       ing.product.id === productId ? { ...ing, weight } : ing
     ));
+    clearManualMacros();
   };
 
   const removeIngredient = (productId: string) => {
     setSelectedIngredients(prev => prev.filter(ing => ing.product.id !== productId));
+    clearManualMacros();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
