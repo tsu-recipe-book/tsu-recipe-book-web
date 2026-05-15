@@ -67,10 +67,15 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onClick, className }) 
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {dish.category && (
+        <div className="flex flex-wrap gap-2 justify-between items-center w-full">
+          {dish.category ? (
             <span className="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-purple-100/50">
               {t(`dishes.categories.${dish.category}`)}
+            </span>
+          ) : <div />}
+          {dish.portionSize && (
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded-lg">
+              {dish.portionSize} {t('dishes.form.weightUnit', 'г')}
             </span>
           )}
         </div>

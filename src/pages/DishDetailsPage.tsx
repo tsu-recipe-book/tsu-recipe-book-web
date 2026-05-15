@@ -146,6 +146,12 @@ const DishDetailsPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-5xl font-black text-gray-900 tracking-tight leading-tight">{dish.name}</h1>
+              {dish.portionSize && (
+                <div className="mt-6 inline-flex items-center px-4 py-2 bg-gray-50 text-gray-600 rounded-2xl text-sm font-bold border border-gray-100 shadow-sm">
+                  <span className="text-gray-400 mr-2 uppercase tracking-widest text-[10px]">{t('dishes.form.portionSize')}:</span>
+                  {dish.portionSize} {t('dishes.form.weightUnit', 'г')}
+                </div>
+              )}
             </div>
           </div>
 
