@@ -82,6 +82,25 @@ const DishListPage: React.FC = () => {
               className="pl-12 pr-4 py-3 w-full border border-gray-100 bg-white rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all shadow-sm font-medium"
             />
           </div>
+          <select
+            value={`${filters.sortBy || ''}-${filters.sortOrder || ''}`}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === '-') {
+                setFilters(prev => ({ ...prev, sortBy: undefined, sortOrder: undefined }));
+              } else {
+                const [sortBy, sortOrder] = val.split('-');
+                setFilters(prev => ({ ...prev, sortBy, sortOrder: sortOrder as 'asc' | 'desc' }));
+              }
+            }}
+            className="px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors cursor-pointer"
+          >
+            <option value="-">{t('common.sortDefault')}</option>
+            <option value="name-asc">{t('common.sortNameAsc')}</option>
+            <option value="name-desc">{t('common.sortNameDesc')}</option>
+            <option value="calories-asc">{t('common.sortCaloriesAsc')}</option>
+            <option value="calories-desc">{t('common.sortCaloriesDesc')}</option>
+          </select>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className={`inline-flex items-center px-6 py-3 border rounded-2xl text-sm font-bold transition-all shadow-sm ${isFilterOpen || (filters.category || (filters.flags?.length ?? 0) > 0)
