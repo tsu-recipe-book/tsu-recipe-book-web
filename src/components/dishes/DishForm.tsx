@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus,
@@ -16,8 +16,10 @@ import type {
   DishCategory,
   ProductListItem,
   ProductDto,
-  ProductFlag
+  ProductFlag,
+  DishNutritionResponse
 } from '../../types/api';
+import { dishService } from '../../api/dishes';
 import { cn } from '../../utils/cn';
 import { getImageUrl } from '../../utils/imageUrl';
 
@@ -67,6 +69,62 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
 
   const [error, setError] = useState<string | null>(null);
 
+  const [autoNutrition, setAutoNutrition] = useState<DishNutritionResponse | null>(null);
+
+  useEffect(() => {
+    if (selectedIngredients.length === 0) {
+      setAutoNutrition(null);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      dishService.calculateNutrition({
+        ingredients: selectedIngredients.map(ing => ({
+          productId: ing.product.id,
+          weight: ing.weight
+        }))
+      })
+        .then(res => setAutoNutrition(res))
+        .catch(err => console.error('Failed to calculate nutrition', err));
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedIngredients]);
+
+  const availableFlags = autoNutrition?.availableFlags || [];
+
+  useEffect(() => {
+    if (selectedIngredients.length > 0 && autoNutrition) {
+      setSelectedFlags(prev => prev.filter(flag => availableFlags.includes(flag)));
+    }
+  }, [availableFlags, selectedIngredients.length, autoNutrition]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newName = e.target.value;
+    const lowerName = newName.toLowerCase();
+
+    const macroMap: Record<string, DishCategory> = {
+      '!десерт': 'DESSERT',
+      '!первое': 'FIRST',
+      '!второе': 'SECOND',
+      '!напиток': 'DRINK',
+      '!салат': 'SALAD',
+      '!суп': 'SOUP',
+      '!перекус': 'SNACK',
+    };
+
+    for (const [macro, cat] of Object.entries(macroMap)) {
+      if (lowerName.includes(macro)) {
+        const regex = new RegExp(macro, 'i');
+        newName = newName.replace(regex, '').trimStart();
+        setCategory(cat);
+        break;
+      }
+    }
+
+    setName(newName);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -113,14 +171,6 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
       return;
     }
 
-    const p = parseFloat(manualProteins || '0');
-    const f = parseFloat(manualFats || '0');
-    const c = parseFloat(manualCarbs || '0');
-    
-    if (p + f + c > 100) {
-      setError(t('products.form.nutritionError'));
-      return;
-    }
 
     const formData = new FormData();
     formData.append('name', name);
@@ -179,7 +229,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
               <input
                 type="text"
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={handleNameChange}
                 className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-300 font-medium"
                 placeholder={t('products.form.namePlaceholder')}
                 required
@@ -214,14 +264,17 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                   <button
                     key={flag}
                     type="button"
+                    disabled={selectedIngredients.length > 0 && !availableFlags.includes(flag)}
                     onClick={() => setSelectedFlags(prev =>
                       prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag]
                     )}
                     className={cn(
                       "px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-300",
-                      selectedFlags.includes(flag)
-                        ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200/50 scale-105"
-                        : "bg-white border-gray-100 text-gray-500 hover:border-emerald-200 hover:bg-emerald-50"
+                      selectedIngredients.length > 0 && !availableFlags.includes(flag)
+                        ? "opacity-50 grayscale cursor-not-allowed bg-gray-50 border-gray-100 text-gray-400"
+                        : selectedFlags.includes(flag)
+                          ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200/50 scale-105"
+                          : "bg-white border-gray-100 text-gray-500 hover:border-emerald-200 hover:bg-emerald-50"
                     )}
                   >
                     {t(`products.flags.${flag}`)}
@@ -328,7 +381,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                 value={manualCalories}
                 onChange={e => setManualCalories(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
-                placeholder={t('dishes.form.calculatedAuto')}
+                placeholder={autoNutrition ? autoNutrition.calories.toFixed(1) : t('dishes.form.calculatedAuto')}
               />
             </div>
             <div>
@@ -338,7 +391,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                 value={manualProteins}
                 onChange={e => setManualProteins(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
-                placeholder={t('dishes.form.calculatedAuto')}
+                placeholder={autoNutrition ? autoNutrition.proteins.toFixed(1) : t('dishes.form.calculatedAuto')}
               />
             </div>
             <div>
@@ -348,7 +401,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                 value={manualFats}
                 onChange={e => setManualFats(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
-                placeholder={t('dishes.form.calculatedAuto')}
+                placeholder={autoNutrition ? autoNutrition.fats.toFixed(1) : t('dishes.form.calculatedAuto')}
               />
             </div>
             <div>
@@ -358,7 +411,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                 value={manualCarbs}
                 onChange={e => setManualCarbs(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
-                placeholder={t('dishes.form.calculatedAuto')}
+                placeholder={autoNutrition ? autoNutrition.carbohydrates.toFixed(1) : t('dishes.form.calculatedAuto')}
               />
             </div>
             <div>
@@ -368,7 +421,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
                 value={manualPortion}
                 onChange={e => setManualPortion(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium text-sm"
-                placeholder={t('dishes.form.calculatedAuto')}
+                placeholder={autoNutrition ? autoNutrition.portionSize.toFixed(1) : t('dishes.form.calculatedAuto')}
               />
             </div>
           </div>

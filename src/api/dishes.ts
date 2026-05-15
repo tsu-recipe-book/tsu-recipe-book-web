@@ -1,5 +1,12 @@
 import api from './axios';
-import type { DishListItem, DishDto, DishCategory, ProductFlag } from '../types/api';
+import type { 
+  DishListItem, 
+  DishDto, 
+  DishCategory, 
+  ProductFlag,
+  DishNutritionCalculationRequest,
+  DishNutritionResponse
+} from '../types/api';
 
 export interface DishFilters {
   search?: string;
@@ -35,6 +42,11 @@ export const dishService = {
     const response = await api.put<DishDto>(`/api/v1/dishes/${id}`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return response.data;
+  },
+
+  calculateNutrition: async (data: DishNutritionCalculationRequest): Promise<DishNutritionResponse> => {
+    const response = await api.post<DishNutritionResponse>('/api/v1/dishes/calculate-nutrition', data);
     return response.data;
   },
 };

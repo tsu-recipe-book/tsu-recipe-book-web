@@ -56,6 +56,24 @@ export interface IngredientDto {
   weight: number;
 }
 
+export interface IngredientCalculationRequest {
+  productId: string;
+  weight: number;
+}
+
+export interface DishNutritionCalculationRequest {
+  ingredients: IngredientCalculationRequest[];
+}
+
+export interface DishNutritionResponse {
+  calories: number;
+  proteins: number;
+  fats: number;
+  carbohydrates: number;
+  portionSize: number;
+  availableFlags: ProductFlag[];
+}
+
 export interface DishDto {
   id: string;
   name: string;

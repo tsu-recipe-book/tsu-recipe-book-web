@@ -11,7 +11,18 @@
     "errorTitle": "Упс! Что-то пошло не так",
     "errorLoading": "Не удалось загрузить данные",
     "retry": "Попробовать снова",
-    "notFound": "Страница не найдена"
+    "notFound": "Страница не найдена",
+    "sortDefault": "По умолчанию",
+    "sortNameAsc": "По названию (А-Я)",
+    "sortNameDesc": "По названию (Я-А)",
+    "sortCaloriesAsc": "По калорийности (возр.)",
+    "sortCaloriesDesc": "По калорийности (убыв.)",
+    "sortProteinsAsc": "По белкам (возр.)",
+    "sortProteinsDesc": "По белкам (убыв.)",
+    "sortFatsAsc": "По жирам (возр.)",
+    "sortFatsDesc": "По жирам (убыв.)",
+    "sortCarbsAsc": "По углеводам (возр.)",
+    "sortCarbsDesc": "По углеводам (убыв.)"
   },
   "nav": {
     "products": "Продукты",

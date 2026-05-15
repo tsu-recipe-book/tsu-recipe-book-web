@@ -11,7 +11,18 @@
     "errorTitle": "Oops! Something went wrong",
     "errorLoading": "Failed to load data",
     "retry": "Try again",
-    "notFound": "Page not found"
+    "notFound": "Page not found",
+    "sortDefault": "Default sorting",
+    "sortNameAsc": "Name (A-Z)",
+    "sortNameDesc": "Name (Z-A)",
+    "sortCaloriesAsc": "Calories (Low to High)",
+    "sortCaloriesDesc": "Calories (High to Low)",
+    "sortProteinsAsc": "Proteins (Low to High)",
+    "sortProteinsDesc": "Proteins (High to Low)",
+    "sortFatsAsc": "Fats (Low to High)",
+    "sortFatsDesc": "Fats (High to Low)",
+    "sortCarbsAsc": "Carbohydrates (Low to High)",
+    "sortCarbsDesc": "Carbohydrates (High to Low)"
   },
   "nav": {
     "products": "Products",

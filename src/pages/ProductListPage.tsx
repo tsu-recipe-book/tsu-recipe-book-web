@@ -88,6 +88,31 @@ const ProductListPage: React.FC = () => {
               className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             />
           </div>
+          <select
+            value={`${filters.sortBy || ''}-${filters.sortOrder || ''}`}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === '-') {
+                setFilters(prev => ({ ...prev, sortBy: undefined, sortOrder: undefined }));
+              } else {
+                const [sortBy, sortOrder] = val.split('-');
+                setFilters(prev => ({ ...prev, sortBy, sortOrder: sortOrder as 'asc' | 'desc' }));
+              }
+            }}
+            className="px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors cursor-pointer"
+          >
+            <option value="-">{t('common.sortDefault')}</option>
+            <option value="name-asc">{t('common.sortNameAsc')}</option>
+            <option value="name-desc">{t('common.sortNameDesc')}</option>
+            <option value="calories-asc">{t('common.sortCaloriesAsc')}</option>
+            <option value="calories-desc">{t('common.sortCaloriesDesc')}</option>
+            <option value="proteins-asc">{t('common.sortProteinsAsc')}</option>
+            <option value="proteins-desc">{t('common.sortProteinsDesc')}</option>
+            <option value="fats-asc">{t('common.sortFatsAsc')}</option>
+            <option value="fats-desc">{t('common.sortFatsDesc')}</option>
+            <option value="carbohydrates-asc">{t('common.sortCarbsAsc')}</option>
+            <option value="carbohydrates-desc">{t('common.sortCarbsDesc')}</option>
+          </select>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className={`inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${isFilterOpen || (filters.category || filters.cookingRequired || (filters.flags?.length ?? 0) > 0)
