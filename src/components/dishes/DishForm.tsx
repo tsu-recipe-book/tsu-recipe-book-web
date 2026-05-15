@@ -113,6 +113,15 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
       return;
     }
 
+    const p = parseFloat(manualProteins || '0');
+    const f = parseFloat(manualFats || '0');
+    const c = parseFloat(manualCarbs || '0');
+    
+    if (p + f + c > 100) {
+      setError(t('products.form.nutritionError'));
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', name);
     formData.append('category', category);
