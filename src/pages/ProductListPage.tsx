@@ -106,6 +106,12 @@ const ProductListPage: React.FC = () => {
             <option value="name-desc">{t('common.sortNameDesc')}</option>
             <option value="calories-asc">{t('common.sortCaloriesAsc')}</option>
             <option value="calories-desc">{t('common.sortCaloriesDesc')}</option>
+            <option value="proteins-asc">{t('common.sortProteinsAsc')}</option>
+            <option value="proteins-desc">{t('common.sortProteinsDesc')}</option>
+            <option value="fats-asc">{t('common.sortFatsAsc')}</option>
+            <option value="fats-desc">{t('common.sortFatsDesc')}</option>
+            <option value="carbohydrates-asc">{t('common.sortCarbsAsc')}</option>
+            <option value="carbohydrates-desc">{t('common.sortCarbsDesc')}</option>
           </select>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}

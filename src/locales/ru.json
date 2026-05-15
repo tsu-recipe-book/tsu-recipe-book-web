@@ -16,7 +16,13 @@
     "sortNameAsc": "По названию (А-Я)",
     "sortNameDesc": "По названию (Я-А)",
     "sortCaloriesAsc": "По калорийности (возр.)",
-    "sortCaloriesDesc": "По калорийности (убыв.)"
+    "sortCaloriesDesc": "По калорийности (убыв.)",
+    "sortProteinsAsc": "По белкам (возр.)",
+    "sortProteinsDesc": "По белкам (убыв.)",
+    "sortFatsAsc": "По жирам (возр.)",
+    "sortFatsDesc": "По жирам (убыв.)",
+    "sortCarbsAsc": "По углеводам (возр.)",
+    "sortCarbsDesc": "По углеводам (убыв.)"
   },
   "nav": {
     "products": "Продукты",
