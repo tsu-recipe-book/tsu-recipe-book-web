@@ -73,10 +73,10 @@ const ProductDetailsPage: React.FC = () => {
   );
 
   const nutritionItems = [
-    { label: t('products.form.calories'), value: product.calories, unit: 'kcal', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: t('products.form.protein'), value: product.proteins, unit: 'g', icon: Dna, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: t('products.form.fat'), value: product.fats, unit: 'g', icon: Droplets, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: t('products.form.carbs'), value: product.carbohydrates, unit: 'g', icon: Carrot, color: 'text-green-500', bg: 'bg-green-50' },
+    { label: t('products.form.calories'), value: product.calories, unit: 'ккал / 100 г', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: t('products.form.protein'), value: product.proteins, unit: 'г / 100 г', icon: Dna, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: t('products.form.fat'), value: product.fats, unit: 'г / 100 г', icon: Droplets, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { label: t('products.form.carbs'), value: product.carbohydrates, unit: 'г / 100 г', icon: Carrot, color: 'text-green-500', bg: 'bg-green-50' },
   ];
 
   const getStatusLabel = (status: string) => {
@@ -90,6 +90,10 @@ const ProductDetailsPage: React.FC = () => {
 
   const formattedUpdateDate = product.updatedAt
     ? new Date(product.updatedAt).toLocaleDateString(i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : null;
+
+  const formattedCreateDate = product.createdAt
+    ? new Date(product.createdAt).toLocaleDateString(i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null;
 
   return (
@@ -158,11 +162,18 @@ const ProductDetailsPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">{product.name}</h1>
-              {formattedUpdateDate && (
-                <p className="text-xs text-gray-400 mt-1">
-                  {t('products.info.updatedAt', { date: formattedUpdateDate })}
-                </p>
-              )}
+              <div className="flex flex-col gap-1 mt-2">
+                {formattedCreateDate && (
+                  <p className="text-xs text-gray-400 font-medium">
+                    Дата создания: {formattedCreateDate}
+                  </p>
+                )}
+                {formattedUpdateDate && (
+                  <p className="text-xs text-gray-400 font-medium">
+                    Дата редактирования: {formattedUpdateDate}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex flex-wrap gap-4 text-sm font-medium">
               <span className="inline-flex items-center px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600">
