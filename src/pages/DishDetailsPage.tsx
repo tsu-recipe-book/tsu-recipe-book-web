@@ -23,7 +23,7 @@ import { ErrorState } from '../components/ui/ErrorState';
 const DishDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data: dish, isLoading, error, refetch } = useDish(id!);
 
@@ -70,11 +70,27 @@ const DishDetailsPage: React.FC = () => {
   );
 
   const nutritionItems = [
-    { label: t('products.form.calories'), value: dish.calories, unit: 'kcal', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: t('products.form.protein'), value: dish.proteins, unit: 'g', icon: Dna, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: t('products.form.fat'), value: dish.fats, unit: 'g', icon: Droplets, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: t('products.form.carbs'), value: dish.carbohydrates, unit: 'g', icon: Carrot, color: 'text-green-500', bg: 'bg-green-50' },
+    { label: t('products.form.calories'), value: dish.calories, unit: 'ккал / порция', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: t('products.form.protein'), value: dish.proteins, unit: 'г / порция', icon: Dna, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: t('products.form.fat'), value: dish.fats, unit: 'г / порция', icon: Droplets, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { label: t('products.form.carbs'), value: dish.carbohydrates, unit: 'г / порция', icon: Carrot, color: 'text-green-500', bg: 'bg-green-50' },
   ];
+
+  const formattedUpdateDate = dish.updatedAt
+    ? new Date(dish.updatedAt).toLocaleDateString(i18n.language, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : null;
+
+  const formattedCreateDate = dish.createdAt
+    ? new Date(dish.createdAt).toLocaleDateString(i18n.language, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : null;
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 pb-20">
@@ -146,6 +162,18 @@ const DishDetailsPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-5xl font-black text-gray-900 tracking-tight leading-tight">{dish.name}</h1>
+              <div className="flex flex-col gap-1 mt-2">
+                {formattedCreateDate && (
+                  <p className="text-xs text-gray-400 font-medium">
+                    Дата создания: {formattedCreateDate}
+                  </p>
+                )}
+                {formattedUpdateDate && (
+                  <p className="text-xs text-gray-400 font-medium">
+                    Дата редактирования: {formattedUpdateDate}
+                  </p>
+                )}
+              </div>
               {dish.portionSize && (
                 <div className="mt-6 inline-flex items-center px-4 py-2 bg-gray-50 text-gray-600 rounded-2xl text-sm font-bold border border-gray-100 shadow-sm">
                   <span className="text-gray-400 mr-2 uppercase tracking-widest text-[10px]">{t('dishes.form.portionSize')}:</span>
