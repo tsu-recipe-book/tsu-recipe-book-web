@@ -18,13 +18,14 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { getImageUrl } from '../utils/imageUrl';
+import { ErrorState } from '../components/ui/ErrorState';
 
 const DishDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const { data: dish, isLoading, error } = useDish(id!);
+  const { data: dish, isLoading, error, refetch } = useDish(id!);
 
   const handleDelete = async () => {
     if (!id || !window.confirm(t('dishes.deleteConfirm'))) return;
@@ -52,7 +53,13 @@ const DishDetailsPage: React.FC = () => {
     </div>
   );
 
-  if (error || !dish) return (
+  if (error) return (
+    <div className="pt-10">
+      <ErrorState onRetry={() => refetch()} />
+    </div>
+  );
+
+  if (!dish) return (
     <div className="text-center py-24 bg-white rounded-[32px] border border-gray-100 shadow-sm">
       <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4 opacity-20" />
       <h2 className="text-2xl font-bold text-gray-900">{t('dishes.notFound')}</h2>

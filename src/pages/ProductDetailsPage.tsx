@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { productService } from '../api/products';
-import { 
-  ArrowLeft, 
-  Flame, 
-  Dna, 
-  Droplets, 
-  Carrot, 
+import {
+  ArrowLeft,
+  Flame,
+  Dna,
+  Droplets,
+  Carrot,
   ChefHat,
   Tag,
   AlertCircle,
@@ -17,13 +17,14 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { getImageUrl } from '../utils/imageUrl';
+import { ErrorState } from '../components/ui/ErrorState';
 
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
-  const { data: product, isLoading, error } = useQuery({
+  const { data: product, isLoading, error, refetch } = useQuery({
     queryKey: ['product', id],
     queryFn: () => productService.getProduct(id!),
     enabled: !!id,
@@ -55,9 +56,15 @@ const ProductDetailsPage: React.FC = () => {
     </div>
   );
 
-  if (error || !product) return (
+  if (error) return (
+    <div className="pt-10">
+      <ErrorState onRetry={() => refetch()} />
+    </div>
+  );
+
+  if (!product) return (
     <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
-      <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+      <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4 opacity-20" />
       <h2 className="text-xl font-bold text-gray-900">{t('products.notFound')}</h2>
       <button onClick={() => navigate('/products')} className="mt-4 text-indigo-600 font-medium hover:underline">
         {t('products.backToList')}
@@ -81,14 +88,14 @@ const ProductDetailsPage: React.FC = () => {
     }
   };
 
-  const formattedUpdateDate = product.updatedAt 
+  const formattedUpdateDate = product.updatedAt
     ? new Date(product.updatedAt).toLocaleDateString(i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null;
 
   return (
     <div className="space-y-8 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <button 
+        <button
           onClick={() => navigate('/products')}
           className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors"
         >
@@ -96,14 +103,14 @@ const ProductDetailsPage: React.FC = () => {
           {t('common.back')}
         </button>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => navigate(`/products/${id}/edit`)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
           >
             <Edit className="w-4 h-4 mr-2" />
             {t('common.edit')}
           </button>
-          <button 
+          <button
             onClick={handleDelete}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
           >
@@ -117,9 +124,9 @@ const ProductDetailsPage: React.FC = () => {
         <div className="space-y-4">
           <div className="aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center">
             {product.photos.length > 0 ? (
-              <img 
-                src={getImageUrl(product.photos[0])} 
-                alt={product.name} 
+              <img
+                src={getImageUrl(product.photos[0])}
+                alt={product.name}
                 className="w-full h-full object-cover"
               />
             ) : (
