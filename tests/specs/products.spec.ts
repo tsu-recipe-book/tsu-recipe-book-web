@@ -264,6 +264,8 @@ test.describe('Product Management', () => {
     const prodA = 'Ааа Веган Продукт';
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodA);
+    await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: 'Овощи' });
+    await page.locator('div:has(> label:has-text("Статус")) select').selectOption({ label: 'Готов к употреблению' });
     await page.locator('div:has(> label:has-text("Калории")) input').fill('10');
     await page.locator('div:has(> label:has-text("Белки")) input').fill('1');
     await page.locator('div:has(> label:has-text("Жиры")) input').fill('0');
@@ -276,6 +278,7 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodB);
     await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: 'Мясо' });
+    await page.locator('div:has(> label:has-text("Статус")) select').selectOption({ label: 'Требует приготовления' });
     await page.locator('div:has(> label:has-text("Калории")) input').fill('500');
     await page.locator('div:has(> label:has-text("Белки")) input').fill('25');
     await page.locator('div:has(> label:has-text("Жиры")) input').fill('40');
@@ -285,34 +288,36 @@ test.describe('Product Management', () => {
 
     await page.getByPlaceholder('Поиск продуктов...').fill(prodA);
     await expect(page.locator(`text=${prodA}`)).toBeVisible();
-    await expect(page.locator(`text=${prodB}`)).not.toBeVisible();
+    await expect(page.locator(`text=${prodB}`).first()).not.toBeVisible();
 
     await page.getByPlaceholder('Поиск продуктов...').fill('');
     await page.click('button:has-text("Фильтры")');
 
     await page.locator('button:has-text("Мясо")').click();
     await expect(page.locator(`text=${prodB}`)).toBeVisible();
-    await expect(page.locator(`text=${prodA}`)).not.toBeVisible();
+    await expect(page.locator(`text=${prodA}`).first()).not.toBeVisible();
+    await page.locator('button:has-text("Мясо")').click();
 
-    await page.click('text=Сбросить все');
+    await page.locator('button:has-text("Готов к употреблению")').click();
+    await expect(page.locator(`text=${prodA}`)).toBeVisible();
+    await expect(page.locator(`text=${prodB}`).first()).not.toBeVisible();
+    await page.locator('button:has-text("Готов к употреблению")').click();
 
     await page.locator('button:has-text("Веган")').click();
     await expect(page.locator(`text=${prodA}`)).toBeVisible();
-    await expect(page.locator(`text=${prodB}`)).not.toBeVisible();
+    await expect(page.locator(`text=${prodB}`).first()).not.toBeVisible();
 
     await page.click('text=Сбросить все');
     await page.click('button:has-text("Фильтры")');
 
     await page.getByPlaceholder('Поиск продуктов...').fill('Продукт');
 
-    await page.locator('select').selectOption({ label: 'По калорийности (возр.)' });
+    await page.locator('select').selectOption({ label: 'По белкам (убыв.)' });
     const cards = page.locator('div.group h3');
-    const firstCardText = await cards.nth(0).innerText();
-    expect(firstCardText).toContain(prodA);
+    await expect.poll(async () => await cards.nth(0).innerText()).toContain(prodB);
 
-    await page.locator('select').selectOption({ label: 'По калорийности (убыв.)' });
-    const firstCardTextDesc = await cards.nth(0).innerText();
-    expect(firstCardTextDesc).toContain(prodB);
+    await page.locator('select').selectOption({ label: 'По калорийности (возр.)' });
+    await expect.poll(async () => await cards.nth(0).innerText()).toContain(prodA);
 
     await page.getByPlaceholder('Поиск продуктов...').fill('');
 
