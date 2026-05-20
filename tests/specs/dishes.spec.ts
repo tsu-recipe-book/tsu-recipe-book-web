@@ -33,7 +33,7 @@ test.describe('Dish Management', () => {
       if (res.ok()) {
         const dishes = await res.json();
         for (const d of dishes) {
-          if ([dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен', 'Блюдо для Редактирования'].includes(d.name)) {
+          if ([dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен', 'Блюдо для Редактирования', 'Блюдо с ингредиентом'].includes(d.name)) {
             await request.delete(`https://tsu-recipe.orexi4.ru/api/v1/dishes/${d.id}`);
           }
         }

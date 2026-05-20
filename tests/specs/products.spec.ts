@@ -1,6 +1,34 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, APIRequestContext } from '@playwright/test';
 
 test.describe('Product Management', () => {
+
+  const cleanOldProducts = async (request: APIRequestContext) => {
+    try {
+      const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
+      if (res.ok()) {
+        const products = await res.json();
+        const namesToClean = [
+          'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу', 
+          'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт'
+        ];
+        for (const p of products) {
+          if (namesToClean.includes(p.name)) {
+            await request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to pre-clean products:', e);
+    }
+  };
+
+  test.beforeAll(async ({ request }) => {
+    await cleanOldProducts(request);
+  });
+
+  test.afterAll(async ({ request }) => {
+    await cleanOldProducts(request);
+  });
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/products');
