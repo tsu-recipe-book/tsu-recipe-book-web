@@ -31,7 +31,7 @@ test.describe('Product Management', () => {
     await page.goto('/products');
   });
 
-  test('Product name length validation (BVA: 0, 1, 2, 3 chars)', async ({ page }) => {
+  test('[1.1] Product name length validation (BVA: 0, 1, 2, 3 chars)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
     await expect(page).toHaveURL('/products/new');
 
@@ -83,7 +83,7 @@ test.describe('Product Management', () => {
     await expect(page).toHaveURL('/products');
   });
 
-  test('PFC sum validation (BVA: 99.9g, 100.0g, 100.1g, 200.0g)', async ({ page }) => {
+  test('[1.2] PFC sum validation (BVA: 99.9g, 100.0g, 100.1g, 200.0g)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
 
     const testName = 'Тест БЖУ Гран';
@@ -110,7 +110,7 @@ test.describe('Product Management', () => {
     await expect(errorAlert).toBeVisible();
     await expect(errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
 
-    await carbInput.fill('40');
+    await carbInput.fill('40.0');
     await page.click('button:has-text("Создать продукт")');
     await expect(page).toHaveURL('/products');
 
@@ -136,7 +136,7 @@ test.describe('Product Management', () => {
     await expect(page).toHaveURL('/products');
   });
 
-  test('Product photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
+  test('[1.3] Product photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
 
     const addButton = page.locator('label:has-text("Добавить")');
@@ -154,10 +154,10 @@ test.describe('Product Management', () => {
     await photoInput.setInputFiles([files[4]]);
     await expect(addButton).not.toBeVisible();
 
-    await page.evaluate(() => {
-      const btn = document.querySelector<HTMLButtonElement>('div.relative.aspect-square button');
-      btn?.click();
-    });
+    const photoGroup = page.locator('div.relative.aspect-square').first();
+    await photoGroup.hover();
+    await photoGroup.locator('button.bg-red-500').click();
+
     await expect(addButton).toBeVisible();
   });
 
@@ -176,7 +176,7 @@ test.describe('Product Management', () => {
   ];
 
   for (const data of testData) {
-    test(`Create product with all fields: ${data.name}`, async ({ page }) => {
+    test(`[1.4] Create product with all fields: ${data.name}`, async ({ page }) => {
       await page.click('button:has-text("Создать новый продукт")');
 
       await page.getByPlaceholder('напр. Куриная грудка').fill(data.name);
@@ -201,6 +201,9 @@ test.describe('Product Management', () => {
 
       await page.click(`text=${data.name}`);
       await expect(page.locator('h1')).toHaveText(data.name);
+
+      await expect(page.locator('text=Дата создания:')).toBeVisible();
+
       await expect(page.locator(`text=${data.composition}`)).toBeVisible();
       await expect(page.locator(`text=${data.calories}`)).toBeVisible();
       await expect(page.locator(`text=${data.proteins}`)).toBeVisible();
@@ -219,7 +222,7 @@ test.describe('Product Management', () => {
     });
   }
 
-  test('Edit existing product', async ({ page }) => {
+  test('[1.5] Edit existing product', async ({ page }) => {
     const nameBefore = 'До изменения';
     const nameAfter = 'После изменения';
 
@@ -245,6 +248,9 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Обновить продукт")');
 
     await expect(page.locator('h1')).toHaveText(nameAfter);
+
+    await expect(page.locator('text=Дата редактирования:')).toBeVisible();
+
     await expect(page.locator('.bg-orange-50 .text-2xl')).toHaveText('99');
     await expect(page.locator('.bg-blue-50 .text-2xl')).toHaveText('9');
     await expect(page.locator('.bg-amber-50 .text-2xl')).toHaveText('3');
@@ -257,7 +263,7 @@ test.describe('Product Management', () => {
     await expect(page).toHaveURL('/products');
   });
 
-  test('Search, filter, and sort products', async ({ page }) => {
+  test('[1.6] Search, filter, and sort products', async ({ page }) => {
     const prodA = 'Ааа Веган Продукт';
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodA);

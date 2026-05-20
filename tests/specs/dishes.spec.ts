@@ -29,7 +29,11 @@ test.describe('Dish Management', () => {
     if (!res.ok()) return;
 
     const dishes = await res.json();
-    const namesToClean = [dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен', 'Блюдо для Редактирования', 'Блюдо с ингредиентом'];
+    const namesToClean = [
+      dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен',
+      'Блюдо для Редактирования', 'Блюдо с ингредиентом', 'Ааа Веган Салат', 'Яяя Мясной Суп',
+      'А', 'Аб', 'Абв'
+    ];
     const dishesToDelete = dishes.filter((d: any) => namesToClean.includes(d.name));
 
     await Promise.all(dishesToDelete.map((d: any) =>
@@ -90,9 +94,77 @@ test.describe('Dish Management', () => {
     await page.goto('/dishes');
   });
 
-  test('[2.1] Automatic PFC calculation based on ingredients — 2 ingredients, expected values', async ({ page }) => {
+  test('[2.1] Dish name length validation (BVA: 0, 1, 2, 3 chars)', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
     await expect(page).toHaveURL('/dishes/new');
+
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+
+    await nameInput.fill('');
+    await page.getByPlaceholder('Поиск продуктов...').fill(prodAName);
+    await page.click(`button:has-text("${prodAName}")`);
+
+    const isRequired = await nameInput.evaluate(el => (el as HTMLInputElement).required);
+    expect(isRequired).toBe(true);
+
+    await nameInput.fill('А');
+    await page.locator('button[type="submit"]').click();
+
+    await expect(page).toHaveURL('/dishes/new');
+
+    await nameInput.fill('Аб');
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL('**/dishes');
+    await expect(page.locator(`text=Аб`)).toBeVisible();
+
+    await page.click('button:has-text("Создать новое блюдо")');
+    await nameInput.fill('Абв');
+    await page.getByPlaceholder('Поиск продуктов...').fill(prodBName);
+    await page.click(`button:has-text("${prodBName}")`);
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL('**/dishes');
+    await expect(page.locator(`text=Абв`)).toBeVisible();
+
+    await page.click(`text=Аб`);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+    await expect(page).toHaveURL('/dishes');
+
+    await page.click(`text=Абв`);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+    await expect(page).toHaveURL('/dishes');
+  });
+
+  test('[2.2] Dish photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
+    await page.click('button:has-text("Создать новое блюдо")');
+
+    const addButton = page.locator('label:has-text("Добавить")');
+    const photoInput = addButton.locator('input[type="file"]');
+
+    const files = Array.from({ length: 5 }, (_, i) => ({
+      name: `photo_${i}.png`,
+      mimeType: 'image/png',
+      buffer: Buffer.from('fake-image-data')
+    }));
+
+    await photoInput.setInputFiles(files.slice(0, 4));
+    await expect(addButton).toBeVisible();
+
+    await photoInput.setInputFiles([files[4]]);
+    await expect(addButton).not.toBeVisible();
+
+    const photoGroup = page.locator('div.relative.aspect-square').first();
+    await photoGroup.hover();
+    await photoGroup.locator('button.bg-red-500').click();
+
+    await expect(addButton).toBeVisible();
+  });
+
+  test('[2.3] Automatic PFC calculation based on ingredients — 2 ingredients, expected values', async ({ page }) => {
+    await page.click('button:has-text("Создать новое блюдо")');
 
     await page.getByPlaceholder('напр. Куриная грудка').fill(dishName);
 
@@ -136,7 +208,7 @@ test.describe('Dish Management', () => {
     await expect(page.locator(`text=${dishName}`)).toBeVisible();
   });
 
-  test('[2.2] Automatic category determination by macro with DB save verification', async ({ page }) => {
+  test('[2.4] Automatic category determination by macro with DB save verification', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     const macroNameInput = 'Борщ домашний !суп';
@@ -165,7 +237,7 @@ test.describe('Dish Management', () => {
     await expect(page).toHaveURL('/dishes');
   });
 
-  test('[2.3] Multiple macros handling — only the first macro applies', async ({ page }) => {
+  test('[2.5] Multiple macros handling — only the first macro applies', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     const multipleMacrosInput = 'Вкусный Тортик !десерт !суп';
@@ -181,7 +253,7 @@ test.describe('Dish Management', () => {
     await expect(soupButton).not.toHaveClass(/bg-indigo-600/);
   });
 
-  test('[2.4] Category priority — form field overrides macro', async ({ page }) => {
+  test('[2.6] Category priority — form field overrides macro', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     await page.getByPlaceholder('напр. Куриная грудка').fill('Странное Блюдо !суп');
@@ -208,7 +280,7 @@ test.describe('Dish Management', () => {
     await expect(page).toHaveURL('/dishes');
   });
 
-  test('[2.5] Manage dietary flags of a dish based on ingredient composition', async ({ page }) => {
+  test('[2.7] Manage dietary flags of a dish based on ingredient composition', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     await page.getByPlaceholder('Поиск продуктов...').fill(veganProdName);
@@ -232,7 +304,7 @@ test.describe('Dish Management', () => {
     await expect(veganButton).not.toHaveClass(/bg-emerald-500/);
   });
 
-  test('[2.6] Prevent deletion of a product used in a dish (DB constraint)', async ({ page }) => {
+  test('[2.8] Prevent deletion of a product used in a dish (DB constraint)', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
     await page.getByPlaceholder('напр. Куриная грудка').fill('Блюдо с ингредиентом');
     await page.getByPlaceholder('Поиск продуктов...').fill(prodAName);
@@ -244,36 +316,90 @@ test.describe('Dish Management', () => {
     await page.goto('/products');
     await page.click(`text=${prodAName}`);
 
-    const dialogMessages: string[] = [];
-    const dialogQueue = [
-      async (dialog: any) => {
-        dialogMessages.push(dialog.message());
-        await dialog.accept();
-      },
-      async (dialog: any) => {
-        dialogMessages.push(dialog.message());
-        await dialog.accept();
-      }
-    ];
-
-    page.on('dialog', async dialog => {
-      const action = dialogQueue.shift()!;
-      await action(dialog);
-    });
-
+    const confirmPromise = page.waitForEvent('dialog');
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.locator('button:has-text("Удалить")').click();
+    const confirmDialog = await confirmPromise;
+    expect(confirmDialog.message()).toContain('Вы уверены');
 
-    await expect.poll(() => dialogQueue.length).toBe(0);
-
-    expect(dialogMessages[0]).toContain('Вы уверены');
-    expect(dialogMessages[1]).toContain('Не удалось удалить продукт');
+    const errorPromise = page.waitForEvent('dialog');
+    await confirmDialog.accept();
+    const errorDialog = await errorPromise;
+    expect(errorDialog.message()).toContain('Не удалось удалить продукт');
+    await errorDialog.accept();
 
     await expect(page).toHaveURL(new RegExp(`/products/`));
     await expect(page.locator('h1')).toHaveText(prodAName);
   });
 
-  test('[2.7] Edit and delete a dish (Full CRUD flow)', async ({ page }) => {
+  test('[2.9] Search, filter, and sort dishes', async ({ page }) => {
+    const dishA = 'Ааа Веган Салат';
+    await page.click('button:has-text("Создать новое блюдо")');
+    await page.getByPlaceholder('напр. Куриная грудка').fill(dishA);
+    await page.click('button:has-text("Салат")');
+    await page.getByPlaceholder('Поиск продуктов...').fill(veganProdName);
+    await page.click(`button:has-text("${veganProdName}")`);
+    await page.locator(`div.group:has(div:has-text("${veganProdName}")) input[type="number"]`).fill('100');
+    await page.click('button:has-text("Веган")');
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL('**/dishes');
+
+    const dishB = 'Яяя Мясной Суп';
+    await page.click('button:has-text("Создать новое блюдо")');
+    await page.getByPlaceholder('напр. Куриная грудка').fill(dishB);
+    await page.click('button:has-text("Суп")');
+    await page.getByPlaceholder('Поиск продуктов...').fill(prodBName);
+    await page.click(`button:has-text("${prodBName}")`);
+    await page.locator(`div.group:has(div:has-text("${prodBName}")) input[type="number"]`).fill('200');
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL('**/dishes');
+
+    await page.getByPlaceholder('Поиск блюд...').fill(dishA);
+    await expect(page.locator(`text=${dishA}`)).toBeVisible();
+    await expect(page.locator(`text=${dishB}`)).not.toBeVisible();
+
+    await page.getByPlaceholder('Поиск блюд...').fill('');
+    await page.click('button:has-text("Фильтры")');
+
+    await page.locator('button:has-text("Суп")').click();
+    await expect(page.locator(`text=${dishB}`)).toBeVisible();
+    await expect(page.locator(`text=${dishA}`)).not.toBeVisible();
+
+    await page.click('text=Сбросить все');
+
+    await page.locator('button:has-text("Салат")').click();
+    await page.locator('button:has-text("Веган")').click();
+    await expect(page.locator(`text=${dishA}`)).toBeVisible();
+    await expect(page.locator(`text=${dishB}`)).not.toBeVisible();
+
+    await page.click('text=Сбросить все');
+    await page.click('button:has-text("Фильтры")');
+
+    await page.locator('select').selectOption({ label: 'По названию (А-Я)' });
+    const cards = page.locator('div.group h3');
+    await expect.poll(async () => await cards.nth(0).innerText()).toContain(dishA);
+
+    await page.locator('select').selectOption({ label: 'По названию (Я-А)' });
+    await expect.poll(async () => await cards.nth(0).innerText()).toContain(dishB);
+
+    await page.getByPlaceholder('Поиск блюд...').fill('');
+
+    await expect(page.locator(`text=${dishA}`)).toBeVisible();
+    await page.click(`text=${dishA}`);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+    await expect(page).toHaveURL('/dishes');
+
+    await expect(page.locator(`text=${dishB}`)).toBeVisible();
+    await page.click(`text=${dishB}`);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+    await expect(page).toHaveURL('/dishes');
+  });
+
+  test('[2.10] Edit and delete a dish (Full CRUD flow & Details verification)', async ({ page }) => {
     const localDishName = 'Блюдо для Редактирования';
     await page.click('button:has-text("Создать новое блюдо")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(localDishName);
@@ -286,13 +412,21 @@ test.describe('Dish Management', () => {
     await page.waitForURL('**/dishes');
 
     await page.click(`text=${localDishName}`);
+
+    await expect(page.locator('h1')).toHaveText(localDishName);
+    await expect(page.locator('text=Дата создания:')).toBeVisible();
+    await expect(page.locator(`text=${veganProdName}`)).toBeVisible();
+    await expect(page.locator('text=100г')).toBeVisible();
+
     await page.click('button:has-text("Редактировать")');
 
     const newDishName = 'Рецепт Изменен';
     await page.getByPlaceholder('напр. Куриная грудка').fill(newDishName);
 
     await page.locator('button[type="submit"]').click();
+
     await expect(page.locator('h1')).toHaveText(newDishName);
+    await expect(page.locator('text=Дата редактирования:')).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
