@@ -6,52 +6,83 @@ test.describe('Product Management', () => {
     await page.goto('/products');
   });
 
-  test('Product name length validation (BVA: 1 char vs 2 chars)', async ({ page }) => {
+  test('Product name length validation (BVA: 0, 1, 2, 3 chars)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
     await expect(page).toHaveURL('/products/new');
 
-    await page.getByPlaceholder('напр. Куриная грудка').fill('А');
-    await page.locator('input[type="number"]').nth(0).fill('100');
-    await page.locator('input[type="number"]').nth(1).fill('10');
-    await page.locator('input[type="number"]').nth(2).fill('5');
-    await page.locator('input[type="number"]').nth(3).fill('2');
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    const calInput = page.locator('div:has(> label:has-text("Калории")) input');
+    const protInput = page.locator('div:has(> label:has-text("Белки")) input');
+    const fatInput = page.locator('div:has(> label:has-text("Жиры")) input');
+    const carbInput = page.locator('div:has(> label:has-text("Углеводы")) input');
+    const submitBtn = page.click('button:has-text("Создать продукт")');
 
+    await nameInput.fill('');
+    await calInput.fill('100');
+    await protInput.fill('10');
+    await fatInput.fill('5');
+    await carbInput.fill('2');
+
+    const isRequired = await nameInput.evaluate(el => (el as HTMLInputElement).required);
+    expect(isRequired).toBe(true);
+
+    await nameInput.fill('А');
     await page.click('button:has-text("Создать продукт")');
 
     const errorAlert = page.locator('div.bg-red-50');
     await expect(errorAlert).toBeVisible();
     await expect(errorAlert).toContainText('Название должно быть не менее 2 символов');
 
-    await page.getByPlaceholder('напр. Куриная грудка').fill('Аб');
+    await nameInput.fill('Аб');
     await page.click('button:has-text("Создать продукт")');
-
     await expect(page).toHaveURL('/products');
 
-    await page.click('text=Аб');
+    await page.click('button:has-text("Создать новый продукт")');
+    await nameInput.fill('Абв');
+    await calInput.fill('100');
+    await protInput.fill('10');
+    await fatInput.fill('5');
+    await carbInput.fill('2');
+    await page.click('button:has-text("Создать продукт")');
+    await expect(page).toHaveURL('/products');
+
+    const cleanups = ['Аб', 'Абв'];
     page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
-    await expect(page).toHaveURL('/products');
+    for (const name of cleanups) {
+      await page.click(`text=${name}`);
+      await page.click('button:has-text("Удалить")');
+      await expect(page).toHaveURL('/products');
+    }
   });
 
-  test('PFC sum validation (BVA: 100.0g vs 100.1g)', async ({ page }) => {
+  test('PFC sum validation (BVA: 99.9g, 100.0g, 100.1g, 200.0g)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
 
-    const testName = 'Тест БЖУ';
+    const testName = 'Тест БЖУ Гран';
     await page.getByPlaceholder('напр. Куриная грудка').fill(testName);
-    await page.locator('input[type="number"]').nth(0).fill('150');
 
-    await page.locator('input[type="number"]').nth(1).fill('40');
-    await page.locator('input[type="number"]').nth(2).fill('30');
-    await page.locator('input[type="number"]').nth(3).fill('30.1');
+    const calInput = page.locator('div:has(> label:has-text("Калории")) input');
+    const protInput = page.locator('div:has(> label:has-text("Белки")) input');
+    const fatInput = page.locator('div:has(> label:has-text("Жиры")) input');
+    const carbInput = page.locator('div:has(> label:has-text("Углеводы")) input');
 
+    await calInput.fill('150');
+
+    await protInput.fill('30');
+    await fatInput.fill('30');
+    await carbInput.fill('40.1');
     await page.click('button:has-text("Создать продукт")');
 
     const errorAlert = page.locator('div.bg-red-50');
     await expect(errorAlert).toBeVisible();
     await expect(errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
 
-    await page.locator('input[type="number"]').nth(3).fill('30');
+    await carbInput.fill('140');
+    await page.click('button:has-text("Создать продукт")');
+    await expect(errorAlert).toBeVisible();
+    await expect(errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
 
+    await carbInput.fill('39.9');
     await page.click('button:has-text("Создать продукт")');
     await expect(page).toHaveURL('/products');
 
@@ -59,6 +90,46 @@ test.describe('Product Management', () => {
     page.on('dialog', dialog => dialog.accept());
     await page.click('button:has-text("Удалить")');
     await expect(page).toHaveURL('/products');
+
+    await page.click('button:has-text("Создать новый продукт")');
+    await page.getByPlaceholder('напр. Куриная грудка').fill(testName);
+    await calInput.fill('150');
+    await protInput.fill('30');
+    await fatInput.fill('30');
+    await carbInput.fill('40');
+    await page.click('button:has-text("Создать продукт")');
+    await expect(page).toHaveURL('/products');
+
+    await page.click(`text=${testName}`);
+    await page.click('button:has-text("Удалить")');
+    await expect(page).toHaveURL('/products');
+  });
+
+  test('Product photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
+    await page.click('button:has-text("Создать новый продукт")');
+
+    const photoInput = page.locator('input[type="file"]');
+    const addButton = page.locator('label:has-text("Добавить")');
+
+    const files = Array.from({ length: 5 }, (_, i) => ({
+      name: `photo_${i}.png`,
+      mimeType: 'image/png',
+      buffer: Buffer.from('fake-image-data')
+    }));
+
+    await photoInput.setInputFiles(files.slice(0, 4));
+    await expect(addButton).toBeVisible();
+
+    await page.reload();
+    const photoInput2 = page.locator('input[type="file"]');
+    const addButton2 = page.locator('label:has-text("Добавить")');
+
+    await photoInput2.setInputFiles(files);
+    await expect(addButton2).not.toBeVisible();
+
+    await page.locator('div.relative.aspect-square').first().hover();
+    await page.locator('div.relative.aspect-square button').first().click();
+    await expect(addButton2).toBeVisible();
   });
 
   const testData = [
@@ -82,13 +153,13 @@ test.describe('Product Management', () => {
       await page.getByPlaceholder('напр. Куриная грудка').fill(data.name);
       await page.getByPlaceholder('напр. Мука, сахар, яйца...').fill(data.composition);
 
-      await page.locator('select').nth(0).selectOption({ label: data.category });
-      await page.locator('select').nth(1).selectOption({ label: data.cookingRequired });
+      await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: data.category });
+      await page.locator('div:has(> label:has-text("Статус")) select').selectOption({ label: data.cookingRequired });
 
-      await page.locator('input[type="number"]').nth(0).fill(data.calories);
-      await page.locator('input[type="number"]').nth(1).fill(data.proteins);
-      await page.locator('input[type="number"]').nth(2).fill(data.fats);
-      await page.locator('input[type="number"]').nth(3).fill(data.carbs);
+      await page.locator('div:has(> label:has-text("Калории")) input').fill(data.calories);
+      await page.locator('div:has(> label:has-text("Белки")) input').fill(data.proteins);
+      await page.locator('div:has(> label:has-text("Жиры")) input').fill(data.fats);
+      await page.locator('div:has(> label:has-text("Углеводы")) input').fill(data.carbs);
 
       for (const flag of data.flags) {
         await page.click(`button:has-text("${flag}")`);
@@ -123,10 +194,10 @@ test.describe('Product Management', () => {
 
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(nameBefore);
-    await page.locator('input[type="number"]').nth(0).fill('50');
-    await page.locator('input[type="number"]').nth(1).fill('5');
-    await page.locator('input[type="number"]').nth(2).fill('2');
-    await page.locator('input[type="number"]').nth(3).fill('1');
+    await page.locator('div:has(> label:has-text("Калории")) input').fill('50');
+    await page.locator('div:has(> label:has-text("Белки")) input').fill('5');
+    await page.locator('div:has(> label:has-text("Жиры")) input').fill('2');
+    await page.locator('div:has(> label:has-text("Углеводы")) input').fill('1');
     await page.click('button:has-text("Создать продукт")');
     await page.waitForURL('**/products');
 
@@ -135,10 +206,10 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Редактировать")');
 
     await page.getByPlaceholder('напр. Куриная грудка').fill(nameAfter);
-    await page.locator('input[type="number"]').nth(0).fill('99');
-    await page.locator('input[type="number"]').nth(1).fill('9');
-    await page.locator('input[type="number"]').nth(2).fill('3');
-    await page.locator('input[type="number"]').nth(3).fill('5');
+    await page.locator('div:has(> label:has-text("Калории")) input').fill('99');
+    await page.locator('div:has(> label:has-text("Белки")) input').fill('9');
+    await page.locator('div:has(> label:has-text("Жиры")) input').fill('3');
+    await page.locator('div:has(> label:has-text("Углеводы")) input').fill('5');
 
     await page.click('button:has-text("Обновить продукт")');
 
@@ -157,10 +228,10 @@ test.describe('Product Management', () => {
     const prodA = 'Ааа Веган Продукт';
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodA);
-    await page.locator('input[type="number"]').nth(0).fill('10');
-    await page.locator('input[type="number"]').nth(1).fill('1');
-    await page.locator('input[type="number"]').nth(2).fill('0');
-    await page.locator('input[type="number"]').nth(3).fill('1');
+    await page.locator('div:has(> label:has-text("Калории")) input').fill('10');
+    await page.locator('div:has(> label:has-text("Белки")) input').fill('1');
+    await page.locator('div:has(> label:has-text("Жиры")) input').fill('0');
+    await page.locator('div:has(> label:has-text("Углеводы")) input').fill('1');
     await page.click('button:has-text("Веган")');
     await page.click('button:has-text("Создать продукт")');
     await page.waitForURL('**/products');
@@ -168,20 +239,18 @@ test.describe('Product Management', () => {
     const prodB = 'Яяя Мясной Продукт';
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodB);
-    await page.locator('select').nth(0).selectOption({ label: 'Мясо' });
-    await page.locator('input[type="number"]').nth(0).fill('500');
-    await page.locator('input[type="number"]').nth(1).fill('25');
-    await page.locator('input[type="number"]').nth(2).fill('40');
-    await page.locator('input[type="number"]').nth(3).fill('0');
+    await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: 'Мясо' });
+    await page.locator('div:has(> label:has-text("Калории")) input').fill('500');
+    await page.locator('div:has(> label:has-text("Белки")) input').fill('25');
+    await page.locator('div:has(> label:has-text("Жиры")) input').fill('40');
+    await page.locator('div:has(> label:has-text("Углеводы")) input').fill('0');
     await page.click('button:has-text("Создать продукт")');
     await page.waitForURL('**/products');
 
-    // Search
     await page.getByPlaceholder('Поиск продуктов...').fill(prodA);
     await expect(page.locator(`text=${prodA}`)).toBeVisible();
     await expect(page.locator(`text=${prodB}`)).not.toBeVisible();
 
-    // Filters
     await page.getByPlaceholder('Поиск продуктов...').fill('');
     await page.click('button:has-text("Фильтры")');
 
@@ -198,7 +267,6 @@ test.describe('Product Management', () => {
     await page.click('text=Сбросить все');
     await page.click('button:has-text("Фильтры")');
 
-    // Sorting
     await page.getByPlaceholder('Поиск продуктов...').fill('Продукт');
 
     await page.locator('select').selectOption({ label: 'По калорийности (возр.)' });
@@ -212,7 +280,6 @@ test.describe('Product Management', () => {
 
     await page.getByPlaceholder('Поиск продуктов...').fill('');
 
-    // Cleanup
     await expect(page.locator(`text=${prodA}`)).toBeVisible();
     await page.click(`text=${prodA}`);
     page.on('dialog', dialog => dialog.accept());
