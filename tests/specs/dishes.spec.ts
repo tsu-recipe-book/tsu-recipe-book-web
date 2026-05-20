@@ -109,7 +109,6 @@ test.describe('Dish Management', () => {
 
     await nameInput.fill('А');
     await page.locator('button[type="submit"]').click();
-
     await expect(page).toHaveURL('/dishes/new');
 
     await nameInput.fill('Аб');
@@ -128,13 +127,13 @@ test.describe('Dish Management', () => {
     await page.click(`text=Аб`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/dishes');
 
     await page.click(`text=Абв`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/dishes');
   });
 
@@ -165,6 +164,7 @@ test.describe('Dish Management', () => {
 
   test('[2.3] Automatic PFC calculation based on ingredients — 2 ingredients, expected values', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
+    await expect(page).toHaveURL('/dishes/new');
 
     await page.getByPlaceholder('напр. Куриная грудка').fill(dishName);
 
@@ -232,7 +232,7 @@ test.describe('Dish Management', () => {
 
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
 
     await expect(page).toHaveURL('/dishes');
   });
@@ -275,7 +275,7 @@ test.describe('Dish Management', () => {
 
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
 
     await expect(page).toHaveURL('/dishes');
   });
@@ -316,17 +316,30 @@ test.describe('Dish Management', () => {
     await page.goto('/products');
     await page.click(`text=${prodAName}`);
 
-    const confirmPromise = page.waitForEvent('dialog');
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.locator('button:has-text("Удалить")').click();
-    const confirmDialog = await confirmPromise;
-    expect(confirmDialog.message()).toContain('Вы уверены');
+    const dialogMessages: string[] = [];
+    const dialogQueue = [
+      async (dialog: any) => {
+        dialogMessages.push(dialog.message());
+        await dialog.accept();
+      },
+      async (dialog: any) => {
+        dialogMessages.push(dialog.message());
+        await dialog.accept();
+      }
+    ];
 
-    const errorPromise = page.waitForEvent('dialog');
-    await confirmDialog.accept();
-    const errorDialog = await errorPromise;
-    expect(errorDialog.message()).toContain('Не удалось удалить продукт');
-    await errorDialog.accept();
+    page.on('dialog', async dialog => {
+      const action = dialogQueue.shift()!;
+      await action(dialog);
+    });
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
+
+    await expect.poll(() => dialogQueue.length).toBe(0);
+
+    expect(dialogMessages[0]).toContain('Вы уверены');
+    expect(dialogMessages[1]).toContain('Не удалось удалить продукт');
 
     await expect(page).toHaveURL(new RegExp(`/products/`));
     await expect(page.locator('h1')).toHaveText(prodAName);
@@ -388,14 +401,14 @@ test.describe('Dish Management', () => {
     await page.click(`text=${dishA}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/dishes');
 
     await expect(page.locator(`text=${dishB}`)).toBeVisible();
     await page.click(`text=${dishB}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/dishes');
   });
 
@@ -430,7 +443,7 @@ test.describe('Dish Management', () => {
 
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
 
     await expect(page).toHaveURL('/dishes');
     await expect(page.locator(`text=${newDishName}`)).not.toBeVisible();

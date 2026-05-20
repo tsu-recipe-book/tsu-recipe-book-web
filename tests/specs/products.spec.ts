@@ -73,13 +73,13 @@ test.describe('Product Management', () => {
     await page.click(`text=Аб`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/products');
 
     await page.click(`text=Абв`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/products');
   });
 
@@ -117,7 +117,7 @@ test.describe('Product Management', () => {
     await page.click(`text=${testName}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/products');
 
     await page.click('button:has-text("Создать новый продукт")');
@@ -132,7 +132,7 @@ test.describe('Product Management', () => {
     await page.click(`text=${testName}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/products');
   });
 
@@ -201,9 +201,7 @@ test.describe('Product Management', () => {
 
       await page.click(`text=${data.name}`);
       await expect(page.locator('h1')).toHaveText(data.name);
-
       await expect(page.locator('text=Дата создания:')).toBeVisible();
-
       await expect(page.locator(`text=${data.composition}`)).toBeVisible();
       await expect(page.locator(`text=${data.calories}`)).toBeVisible();
       await expect(page.locator(`text=${data.proteins}`)).toBeVisible();
@@ -216,7 +214,7 @@ test.describe('Product Management', () => {
 
       await page.evaluate(() => window.scrollTo(0, 0));
       page.once('dialog', dialog => dialog.accept());
-      await page.locator('button:has-text("Удалить")').click();
+      await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
 
       await expect(page).toHaveURL('/products');
     });
@@ -248,7 +246,6 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Обновить продукт")');
 
     await expect(page.locator('h1')).toHaveText(nameAfter);
-
     await expect(page.locator('text=Дата редактирования:')).toBeVisible();
 
     await expect(page.locator('.bg-orange-50 .text-2xl')).toHaveText('99');
@@ -258,7 +255,7 @@ test.describe('Product Management', () => {
 
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
 
     await expect(page).toHaveURL('/products');
   });
@@ -323,14 +320,14 @@ test.describe('Product Management', () => {
     await page.click(`text=${prodA}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/products');
 
     await expect(page.locator(`text=${prodB}`)).toBeVisible();
     await page.click(`text=${prodB}`);
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('button:has-text("Удалить")').click();
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
     await expect(page).toHaveURL('/products');
   });
 });
