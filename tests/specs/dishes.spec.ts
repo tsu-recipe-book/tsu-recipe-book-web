@@ -2,11 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Dish Management', () => {
 
-  const uniqueSuffix = Date.now();
-  const prodAName = `Ингредиент А ${uniqueSuffix}`;
-  const prodBName = `Ингредиент Б ${uniqueSuffix}`;
-  const veganProdName = `Веганский Продукт ${uniqueSuffix}`;
-  const dishName = `Тестовое Блюдо ${uniqueSuffix}`;
+  const prodAName = 'Ингредиент А';
+  const prodBName = 'Ингредиент Б';
+  const veganProdName = 'Веганский Продукт';
+  const dishName = 'Тестовое Блюдо';
 
   test.beforeAll(async ({ playwright }) => {
     const browser = await playwright.chromium.launch();
@@ -142,7 +141,7 @@ test.describe('Dish Management', () => {
   });
 
   test('Edit and delete a dish', async ({ page }) => {
-    const localDishName = `Блюдо для Редактирования ${uniqueSuffix}`;
+    const localDishName = 'Блюдо для Редактирования';
     await page.click('button:has-text("Создать новое блюдо")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(localDishName);
 
@@ -156,7 +155,7 @@ test.describe('Dish Management', () => {
     await page.click(`text=${localDishName}`);
     await page.click('button:has-text("Редактировать")');
 
-    const newDishName = `Рецепт Изменен ${uniqueSuffix}`;
+    const newDishName = 'Рецепт Изменен';
     await page.getByPlaceholder('напр. Куриная грудка').fill(newDishName);
 
     await page.locator('button[type="submit"]').click();

@@ -36,7 +36,7 @@ test.describe('Product Management', () => {
   test('PFC sum validation (BVA: 100.0g vs 100.1g)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
 
-    const testName = 'Тест БЖУ ' + Date.now();
+    const testName = 'Тест БЖУ';
     await page.getByPlaceholder('напр. Куриная грудка').fill(testName);
     await page.locator('input[type="number"]').nth(0).fill('150');
 
@@ -118,8 +118,8 @@ test.describe('Product Management', () => {
   }
 
   test('Edit existing product', async ({ page }) => {
-    const nameBefore = 'До изменения ' + Date.now();
-    const nameAfter = 'После изменения ' + Date.now();
+    const nameBefore = 'До изменения';
+    const nameAfter = 'После изменения';
 
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(nameBefore);
@@ -154,8 +154,7 @@ test.describe('Product Management', () => {
   });
 
   test('Search, filter, and sort products', async ({ page }) => {
-    const testSuffix = Date.now();
-    const prodA = 'Ааа Веган Продукт ' + testSuffix;
+    const prodA = 'Ааа Веган Продукт';
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodA);
     await page.locator('input[type="number"]').nth(0).fill('10');
@@ -166,7 +165,7 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Создать продукт")');
     await page.waitForURL('**/products');
 
-    const prodB = 'Яяя Мясной Продукт ' + testSuffix;
+    const prodB = 'Яяя Мясной Продукт';
     await page.click('button:has-text("Создать новый продукт")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(prodB);
     await page.locator('select').nth(0).selectOption({ label: 'Мясо' });
@@ -200,7 +199,7 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Фильтры")');
 
     // Sorting
-    await page.getByPlaceholder('Поиск продуктов...').fill(String(testSuffix));
+    await page.getByPlaceholder('Поиск продуктов...').fill('Продукт');
 
     await page.locator('select').selectOption({ label: 'По калорийности (возр.)' });
     const cards = page.locator('div.group h3');
