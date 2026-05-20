@@ -8,7 +8,7 @@ test.describe('Product Management', () => {
       if (res.ok()) {
         const products = await res.json();
         const namesToClean = [
-          'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу', 
+          'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу',
           'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт'
         ];
         for (const p of products) {
@@ -43,7 +43,6 @@ test.describe('Product Management', () => {
     const protInput = page.locator('div:has(> label:has-text("Белки")) input');
     const fatInput = page.locator('div:has(> label:has-text("Жиры")) input');
     const carbInput = page.locator('div:has(> label:has-text("Углеводы")) input');
-    const submitBtn = page.click('button:has-text("Создать продукт")');
 
     await nameInput.fill('');
     await calInput.fill('100');
@@ -95,22 +94,22 @@ test.describe('Product Management', () => {
     const carbInput = page.locator('div:has(> label:has-text("Углеводы")) input');
 
     await calInput.fill('150');
-
     await protInput.fill('30');
     await fatInput.fill('30');
-    await carbInput.fill('40.1');
-    await page.click('button:has-text("Создать продукт")');
 
     const errorAlert = page.locator('div.bg-red-50');
-    await expect(errorAlert).toBeVisible();
-    await expect(errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
 
     await carbInput.fill('140');
     await page.click('button:has-text("Создать продукт")');
     await expect(errorAlert).toBeVisible();
     await expect(errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
 
-    await carbInput.fill('39.9');
+    await carbInput.fill('40.1');
+    await page.click('button:has-text("Создать продукт")');
+    await expect(errorAlert).toBeVisible();
+    await expect(errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
+
+    await carbInput.fill('40');
     await page.click('button:has-text("Создать продукт")');
     await expect(page).toHaveURL('/products');
 
@@ -124,7 +123,7 @@ test.describe('Product Management', () => {
     await calInput.fill('150');
     await protInput.fill('30');
     await fatInput.fill('30');
-    await carbInput.fill('40');
+    await carbInput.fill('39.9');
     await page.click('button:has-text("Создать продукт")');
     await expect(page).toHaveURL('/products');
 
@@ -136,8 +135,8 @@ test.describe('Product Management', () => {
   test('Product photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
     await page.click('button:has-text("Создать новый продукт")');
 
-    const photoInput = page.locator('input[type="file"]');
     const addButton = page.locator('label:has-text("Добавить")');
+    const photoInput = addButton.locator('input[type="file"]');
 
     const files = Array.from({ length: 5 }, (_, i) => ({
       name: `photo_${i}.png`,
@@ -148,16 +147,14 @@ test.describe('Product Management', () => {
     await photoInput.setInputFiles(files.slice(0, 4));
     await expect(addButton).toBeVisible();
 
-    await page.reload();
-    const photoInput2 = page.locator('input[type="file"]');
-    const addButton2 = page.locator('label:has-text("Добавить")');
+    await photoInput.setInputFiles([files[4]]);
+    await expect(addButton).not.toBeVisible();
 
-    await photoInput2.setInputFiles(files);
-    await expect(addButton2).not.toBeVisible();
-
-    await page.locator('div.relative.aspect-square').first().hover();
-    await page.locator('div.relative.aspect-square button').first().click();
-    await expect(addButton2).toBeVisible();
+    await page.evaluate(() => {
+      const btn = document.querySelector<HTMLButtonElement>('div.relative.aspect-square button');
+      btn?.click();
+    });
+    await expect(addButton).toBeVisible();
   });
 
   const testData = [

@@ -47,34 +47,38 @@ test.describe('Dish Management', () => {
     await cleanOldDishes(request);
     await cleanOldProducts(request);
 
-    const resA = await request.post('https://tsu-recipe.orexi4.ru/api/v1/products', {
-      multipart: {
-        name: prodAName,
-        calories: '100',
-        proteins: '10',
-        fats: '5',
-        carbohydrates: '2',
-        category: 'VEGETABLES',
-        cookingRequired: 'READY_TO_EAT',
-        composition: 'Тестовый ингредиент А'
-      }
+    const formA = new FormData();
+    formA.append('name', prodAName);
+    formA.append('calories', '100');
+    formA.append('proteins', '10');
+    formA.append('fats', '5');
+    formA.append('carbohydrates', '2');
+    formA.append('category', 'VEGETABLES');
+    formA.append('cookingRequired', 'READY_TO_EAT');
+    formA.append('composition', 'Тестовый ингредиент А');
+
+    const resA = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', {
+      method: 'POST',
+      body: formA
     });
-    const dataA = await resA.json();
+    const dataA = await resA.json() as any;
     prodAId = dataA.id;
 
-    const resB = await request.post('https://tsu-recipe.orexi4.ru/api/v1/products', {
-      multipart: {
-        name: prodBName,
-        calories: '200',
-        proteins: '5',
-        fats: '10',
-        carbohydrates: '20',
-        category: 'VEGETABLES',
-        cookingRequired: 'READY_TO_EAT',
-        composition: 'Тестовый ингредиент Б'
-      }
+    const formB = new FormData();
+    formB.append('name', prodBName);
+    formB.append('calories', '200');
+    formB.append('proteins', '5');
+    formB.append('fats', '10');
+    formB.append('carbohydrates', '20');
+    formB.append('category', 'VEGETABLES');
+    formB.append('cookingRequired', 'READY_TO_EAT');
+    formB.append('composition', 'Тестовый ингредиент Б');
+
+    const resB = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', {
+      method: 'POST',
+      body: formB
     });
-    const dataB = await resB.json();
+    const dataB = await resB.json() as any;
     prodBId = dataB.id;
 
     const formData = new FormData();
@@ -101,7 +105,7 @@ test.describe('Dish Management', () => {
     await page.goto('/dishes');
   });
 
-  test('Automatic PFC calculation based on ingredients', async ({ page }) => {
+  test('[2.1] Automatic PFC calculation based on ingredients — 2 ingredients, expected values', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
     await expect(page).toHaveURL('/dishes/new');
 
@@ -139,7 +143,7 @@ test.describe('Dish Management', () => {
     await expect(page.locator(`text=${dishName}`)).toBeVisible();
   });
 
-  test('Automatic category determination by macro with DB save verification', async ({ page }) => {
+  test('[2.2] Automatic category determination by macro with DB save verification', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     const macroNameInput = 'Борщ домашний !суп';
@@ -166,7 +170,7 @@ test.describe('Dish Management', () => {
     await expect(page).toHaveURL('/dishes');
   });
 
-  test('Multiple macros handling (only the first macro applies)', async ({ page }) => {
+  test('[2.3] Multiple macros handling — only the first macro applies', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     const multipleMacrosInput = 'Вкусный Тортик !десерт !суп';
@@ -182,7 +186,7 @@ test.describe('Dish Management', () => {
     await expect(soupButton).not.toHaveClass(/bg-indigo-600/);
   });
 
-  test('Category priority: form field overrides macro', async ({ page }) => {
+  test('[2.4] Category priority — form field overrides macro', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     await page.getByPlaceholder('напр. Куриная грудка').fill('Странное Блюдо !суп');
@@ -207,7 +211,7 @@ test.describe('Dish Management', () => {
     await expect(page).toHaveURL('/dishes');
   });
 
-  test('Manage dietary flags of a dish', async ({ page }) => {
+  test('[2.5] Manage dietary flags of a dish based on ingredient composition', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
     await page.getByPlaceholder('Поиск продуктов...').fill(veganProdName);
@@ -231,7 +235,7 @@ test.describe('Dish Management', () => {
     await expect(veganButton).not.toHaveClass(/bg-emerald-500/);
   });
 
-  test('Prevent deletion of a product used in a dish', async ({ page }) => {
+  test('[2.6] Prevent deletion of a product used in a dish (DB constraint)', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
     await page.getByPlaceholder('напр. Куриная грудка').fill('Блюдо с ингредиентом');
     await page.getByPlaceholder('Поиск продуктов...').fill(prodAName);
@@ -261,7 +265,7 @@ test.describe('Dish Management', () => {
     await expect(page.locator('h1')).toHaveText(prodAName);
   });
 
-  test('Edit and delete a dish', async ({ page }) => {
+  test('[2.7] Edit and delete a dish (Full CRUD flow)', async ({ page }) => {
     const localDishName = 'Блюдо для Редактирования';
     await page.click('button:has-text("Создать новое блюдо")');
     await page.getByPlaceholder('напр. Куриная грудка').fill(localDishName);
