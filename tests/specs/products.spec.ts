@@ -3,23 +3,20 @@ import { test, expect, APIRequestContext } from '@playwright/test';
 test.describe('Product Management', () => {
 
   const cleanOldProducts = async (request: APIRequestContext) => {
-    try {
-      const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
-      if (res.ok()) {
-        const products = await res.json();
-        const namesToClean = [
-          'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу',
-          'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт'
-        ];
-        for (const p of products) {
-          if (namesToClean.includes(p.name)) {
-            await request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`);
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Failed to pre-clean products:', e);
-    }
+    const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
+    if (!res.ok()) return;
+
+    const products = await res.json();
+    const namesToClean = [
+      'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу',
+      'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт'
+    ];
+
+    const productsToDelete = products.filter((p: any) => namesToClean.includes(p.name));
+
+    await Promise.all(productsToDelete.map((p: any) =>
+      request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`)
+    ));
   };
 
   test.beforeAll(async ({ request }) => {
@@ -73,13 +70,17 @@ test.describe('Product Management', () => {
     await page.click('button:has-text("Создать продукт")');
     await expect(page).toHaveURL('/products');
 
-    const cleanups = ['Аб', 'Абв'];
-    page.on('dialog', dialog => dialog.accept());
-    for (const name of cleanups) {
-      await page.click(`text=${name}`);
-      await page.click('button:has-text("Удалить")');
-      await expect(page).toHaveURL('/products');
-    }
+    await page.click(`text=Аб`);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+    await expect(page).toHaveURL('/products');
+
+    await page.click(`text=Абв`);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+    await expect(page).toHaveURL('/products');
   });
 
   test('PFC sum validation (BVA: 99.9g, 100.0g, 100.1g, 200.0g)', async ({ page }) => {
@@ -114,8 +115,9 @@ test.describe('Product Management', () => {
     await expect(page).toHaveURL('/products');
 
     await page.click(`text=${testName}`);
-    page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
     await expect(page).toHaveURL('/products');
 
     await page.click('button:has-text("Создать новый продукт")');
@@ -128,7 +130,9 @@ test.describe('Product Management', () => {
     await expect(page).toHaveURL('/products');
 
     await page.click(`text=${testName}`);
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
     await expect(page).toHaveURL('/products');
   });
 
@@ -207,8 +211,10 @@ test.describe('Product Management', () => {
         await expect(page.locator(`span:has-text("${flag}")`)).toBeVisible();
       }
 
-      page.on('dialog', dialog => dialog.accept());
-      await page.click('button:has-text("Удалить")');
+      await page.evaluate(() => window.scrollTo(0, 0));
+      page.once('dialog', dialog => dialog.accept());
+      await page.locator('button:has-text("Удалить")').click();
+
       await expect(page).toHaveURL('/products');
     });
   }
@@ -244,8 +250,10 @@ test.describe('Product Management', () => {
     await expect(page.locator('.bg-amber-50 .text-2xl')).toHaveText('3');
     await expect(page.locator('.bg-green-50 .text-2xl')).toHaveText('5');
 
-    page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+
     await expect(page).toHaveURL('/products');
   });
 
@@ -307,13 +315,16 @@ test.describe('Product Management', () => {
 
     await expect(page.locator(`text=${prodA}`)).toBeVisible();
     await page.click(`text=${prodA}`);
-    page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
     await expect(page).toHaveURL('/products');
 
     await expect(page.locator(`text=${prodB}`)).toBeVisible();
     await page.click(`text=${prodB}`);
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
     await expect(page).toHaveURL('/products');
   });
 });

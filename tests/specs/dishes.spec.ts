@@ -12,35 +12,29 @@ test.describe('Dish Management', () => {
   let veganProdId: string;
 
   const cleanOldProducts = async (request: APIRequestContext) => {
-    try {
-      const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
-      if (res.ok()) {
-        const products = await res.json();
-        for (const p of products) {
-          if ([prodAName, prodBName, veganProdName].includes(p.name)) {
-            await request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`);
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Failed to pre-clean products:', e);
-    }
+    const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
+    if (!res.ok()) return;
+
+    const products = await res.json();
+    const namesToClean = [prodAName, prodBName, veganProdName];
+    const productsToDelete = products.filter((p: any) => namesToClean.includes(p.name));
+
+    await Promise.all(productsToDelete.map((p: any) =>
+      request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`)
+    ));
   };
 
   const cleanOldDishes = async (request: APIRequestContext) => {
-    try {
-      const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/dishes');
-      if (res.ok()) {
-        const dishes = await res.json();
-        for (const d of dishes) {
-          if ([dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен', 'Блюдо для Редактирования', 'Блюдо с ингредиентом'].includes(d.name)) {
-            await request.delete(`https://tsu-recipe.orexi4.ru/api/v1/dishes/${d.id}`);
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Failed to pre-clean dishes:', e);
-    }
+    const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/dishes');
+    if (!res.ok()) return;
+
+    const dishes = await res.json();
+    const namesToClean = [dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен', 'Блюдо для Редактирования', 'Блюдо с ингредиентом'];
+    const dishesToDelete = dishes.filter((d: any) => namesToClean.includes(d.name));
+
+    await Promise.all(dishesToDelete.map((d: any) =>
+      request.delete(`https://tsu-recipe.orexi4.ru/api/v1/dishes/${d.id}`)
+    ));
   };
 
   test.beforeAll(async ({ request }) => {
@@ -57,10 +51,7 @@ test.describe('Dish Management', () => {
     formA.append('cookingRequired', 'READY_TO_EAT');
     formA.append('composition', 'Тестовый ингредиент А');
 
-    const resA = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', {
-      method: 'POST',
-      body: formA
-    });
+    const resA = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', { method: 'POST', body: formA });
     const dataA = await resA.json() as any;
     prodAId = dataA.id;
 
@@ -74,10 +65,7 @@ test.describe('Dish Management', () => {
     formB.append('cookingRequired', 'READY_TO_EAT');
     formB.append('composition', 'Тестовый ингредиент Б');
 
-    const resB = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', {
-      method: 'POST',
-      body: formB
-    });
+    const resB = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', { method: 'POST', body: formB });
     const dataB = await resB.json() as any;
     prodBId = dataB.id;
 
@@ -93,10 +81,7 @@ test.describe('Dish Management', () => {
     formData.append('flags', 'VEGAN');
     formData.append('flags', 'SUGAR_FREE');
 
-    const resVegan = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', {
-      method: 'POST',
-      body: formData
-    });
+    const resVegan = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', { method: 'POST', body: formData });
     const dataVegan = await resVegan.json() as any;
     veganProdId = dataVegan.id;
   });
@@ -120,22 +105,30 @@ test.describe('Dish Management', () => {
     await page.locator(`div.group:has(div:has-text("${prodAName}")) input[type="number"]`).fill('150');
     await page.locator(`div.group:has(div:has-text("${prodBName}")) input[type="number"]`).fill('50');
 
-    await page.waitForTimeout(1000);
+    await expect.poll(async () => {
+      const val = await page.locator('div:has(> label:has-text("Калории")) input').getAttribute('placeholder');
+      return Number(val);
+    }).toBeCloseTo(250.0, 1);
 
-    const calPlaceholder = await page.locator('div:has(> label:has-text("Калории")) input').getAttribute('placeholder');
-    expect(Number(calPlaceholder)).toBeCloseTo(250.0, 1);
+    await expect.poll(async () => {
+      const val = await page.locator('div:has(> label:has-text("Белки")) input').getAttribute('placeholder');
+      return Number(val);
+    }).toBeCloseTo(17.5, 1);
 
-    const protPlaceholder = await page.locator('div:has(> label:has-text("Белки")) input').getAttribute('placeholder');
-    expect(Number(protPlaceholder)).toBeCloseTo(17.5, 1);
+    await expect.poll(async () => {
+      const val = await page.locator('div:has(> label:has-text("Жиры")) input').getAttribute('placeholder');
+      return Number(val);
+    }).toBeCloseTo(12.5, 1);
 
-    const fatPlaceholder = await page.locator('div:has(> label:has-text("Жиры")) input').getAttribute('placeholder');
-    expect(Number(fatPlaceholder)).toBeCloseTo(12.5, 1);
+    await expect.poll(async () => {
+      const val = await page.locator('div:has(> label:has-text("Углеводы")) input').getAttribute('placeholder');
+      return Number(val);
+    }).toBeCloseTo(13.0, 1);
 
-    const carbPlaceholder = await page.locator('div:has(> label:has-text("Углеводы")) input').getAttribute('placeholder');
-    expect(Number(carbPlaceholder)).toBeCloseTo(13.0, 1);
-
-    const portionPlaceholder = await page.locator('div:has(> label:has-text("Вес порции")) input').getAttribute('placeholder');
-    expect(Number(portionPlaceholder)).toBeCloseTo(200.0, 1);
+    await expect.poll(async () => {
+      const val = await page.locator('div:has(> label:has-text("Вес порции")) input').getAttribute('placeholder');
+      return Number(val);
+    }).toBeCloseTo(200.0, 1);
 
     await page.locator('button[type="submit"]').click();
 
@@ -165,8 +158,10 @@ test.describe('Dish Management', () => {
     await page.click('text=Борщ домашний');
     await expect(page.locator('span:has-text("Суп")')).toBeVisible();
 
-    page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+
     await expect(page).toHaveURL('/dishes');
   });
 
@@ -206,8 +201,10 @@ test.describe('Dish Management', () => {
     await page.click('text=Странное Блюдо');
     await expect(page.locator('span:has-text("Салат")')).toBeVisible();
 
-    page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
+
     await expect(page).toHaveURL('/dishes');
   });
 
@@ -247,19 +244,30 @@ test.describe('Dish Management', () => {
     await page.goto('/products');
     await page.click(`text=${prodAName}`);
 
-    let dialogCount = 0;
-    page.on('dialog', async dialog => {
-      dialogCount++;
-      if (dialogCount === 1) {
-        expect(dialog.message()).toContain('Вы уверены');
+    const dialogMessages: string[] = [];
+    const dialogQueue = [
+      async (dialog: any) => {
+        dialogMessages.push(dialog.message());
         await dialog.accept();
-      } else if (dialogCount === 2) {
-        expect(dialog.message()).toContain('Не удалось удалить продукт');
+      },
+      async (dialog: any) => {
+        dialogMessages.push(dialog.message());
         await dialog.accept();
       }
+    ];
+
+    page.on('dialog', async dialog => {
+      const action = dialogQueue.shift()!;
+      await action(dialog);
     });
 
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.locator('button:has-text("Удалить")').click();
+
+    await expect.poll(() => dialogQueue.length).toBe(0);
+
+    expect(dialogMessages[0]).toContain('Вы уверены');
+    expect(dialogMessages[1]).toContain('Не удалось удалить продукт');
 
     await expect(page).toHaveURL(new RegExp(`/products/`));
     await expect(page.locator('h1')).toHaveText(prodAName);
@@ -286,8 +294,9 @@ test.describe('Dish Management', () => {
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('h1')).toHaveText(newDishName);
 
-    page.on('dialog', dialog => dialog.accept());
-    await page.click('button:has-text("Удалить")');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').click();
 
     await expect(page).toHaveURL('/dishes');
     await expect(page.locator(`text=${newDishName}`)).not.toBeVisible();
