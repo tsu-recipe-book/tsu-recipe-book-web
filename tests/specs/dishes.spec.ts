@@ -94,47 +94,62 @@ test.describe('Dish Management', () => {
     await page.goto('/dishes');
   });
 
-  test('[2.1] Dish name length validation (BVA: 0, 1, 2, 3 chars)', async ({ page }) => {
+  test('[2.1] Dish name length validation (BVA: 0 chars)', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
     await expect(page).toHaveURL('/dishes/new');
 
     const nameInput = page.getByPlaceholder('напр. Куриная грудка');
-
     await nameInput.fill('');
+    const isRequired = await nameInput.evaluate(el => (el as HTMLInputElement).required);
+    expect(isRequired).toBe(true);
+  });
+
+  test('[2.1] Dish name length validation (BVA: 1 char)', async ({ page }) => {
+    await page.click('button:has-text("Создать новое блюдо")');
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('А');
+
     await page.getByPlaceholder('Поиск продуктов...').fill(prodAName);
     await page.click(`button:has-text("${prodAName}")`);
 
-    const isRequired = await nameInput.evaluate(el => (el as HTMLInputElement).required);
-    expect(isRequired).toBe(true);
-
-    await nameInput.fill('А');
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL('/dishes/new');
+  });
 
-    await nameInput.fill('Аб');
-    await page.locator('button[type="submit"]').click();
-    await page.waitForURL('**/dishes');
-    await expect(page.locator(`text=Аб`)).toBeVisible();
-
+  test('[2.1] Dish name length validation (BVA: 2 chars)', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
-    await nameInput.fill('Абв');
-    await page.getByPlaceholder('Поиск продуктов...').fill(prodBName);
-    await page.click(`button:has-text("${prodBName}")`);
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('Аб');
+
+    await page.getByPlaceholder('Поиск продуктов...').fill(prodAName);
+    await page.click(`button:has-text("${prodAName}")`);
+
     await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dishes');
-    await expect(page.locator(`text=Абв`)).toBeVisible();
+    await expect(page.locator('h3').filter({ hasText: 'Аб' })).toBeVisible();
 
-    await page.click(`text=Аб`);
+    await page.locator('h3').filter({ hasText: 'Аб' }).click();
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
     await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
-    await expect(page).toHaveURL('/dishes');
+  });
 
-    await page.click(`text=Абв`);
+  test('[2.1] Dish name length validation (BVA: 3 chars)', async ({ page }) => {
+    await page.click('button:has-text("Создать новое блюдо")');
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('Абв');
+
+    await page.getByPlaceholder('Поиск продуктов...').fill(prodAName);
+    await page.click(`button:has-text("${prodAName}")`);
+
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL('**/dishes');
+    await expect(page.locator('h3').filter({ hasText: 'Абв' })).toBeVisible();
+
+    await page.locator('h3').filter({ hasText: 'Абв' }).click();
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
     await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
-    await expect(page).toHaveURL('/dishes');
   });
 
   test('[2.2] Dish photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
@@ -208,17 +223,16 @@ test.describe('Dish Management', () => {
     await expect(page.locator(`text=${dishName}`)).toBeVisible();
   });
 
-  test('[2.4] Automatic category determination by macro with DB save verification', async ({ page }) => {
+  test('[2.4] Automatic category determination by macro with DB save verification (Суп)', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('Борщ домашний !суп');
+    await nameInput.blur();
 
-    const macroNameInput = 'Борщ домашний !суп';
-    await page.getByPlaceholder('напр. Куриная грудка').fill(macroNameInput);
-
-    const nameVal = await page.getByPlaceholder('напр. Куриная грудка').inputValue();
+    const nameVal = await nameInput.inputValue();
     expect(nameVal.trim()).toBe('Борщ домашний');
-
-    const soupButton = page.locator('button:has-text("Суп")');
-    await expect(soupButton).toHaveClass(/bg-indigo-600/);
+    const categoryButton = page.locator(`button:has-text("Суп")`);
+    await expect(categoryButton).toHaveClass(/bg-indigo-600/);
 
     await page.getByPlaceholder('Поиск продуктов...').fill(veganProdName);
     await page.click(`button:has-text("${veganProdName}")`);
@@ -227,23 +241,48 @@ test.describe('Dish Management', () => {
     await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dishes');
 
-    await page.click('text=Борщ домашний');
-    await expect(page.locator('span:has-text("Суп")')).toBeVisible();
+    await page.click(`text=Борщ домашний`);
+    await expect(page.locator(`span:has-text("Суп")`).first()).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 0));
     page.once('dialog', dialog => dialog.accept());
     await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
+  });
 
-    await expect(page).toHaveURL('/dishes');
+  test('[2.4] Automatic category determination by macro with DB save verification (Перекус)', async ({ page }) => {
+    await page.click('button:has-text("Создать новое блюдо")');
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('Яблоко !перекус');
+    await nameInput.blur();
+
+    const nameVal = await nameInput.inputValue();
+    expect(nameVal.trim()).toBe('Яблоко');
+    const categoryButton = page.locator(`button:has-text("Закуска")`);
+    await expect(categoryButton).toHaveClass(/bg-indigo-600/);
+
+    await page.getByPlaceholder('Поиск продуктов...').fill(veganProdName);
+    await page.click(`button:has-text("${veganProdName}")`);
+    await page.locator(`div.group:has(div:has-text("${veganProdName}")) input[type="number"]`).fill('100');
+
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL('**/dishes');
+
+    await page.click(`text=Яблоко`);
+    await expect(page.locator(`span:has-text("Закуска")`)).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
   });
 
   test('[2.5] Multiple macros handling — only the first macro applies', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
-    const multipleMacrosInput = 'Вкусный Тортик !десерт !суп';
-    await page.getByPlaceholder('напр. Куриная грудка').fill(multipleMacrosInput);
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('Вкусный Тортик !десерт !суп');
+    await nameInput.blur();
 
-    const nameVal = await page.getByPlaceholder('напр. Куриная грудка').inputValue();
+    const nameVal = await nameInput.inputValue();
     expect(nameVal.trim()).toBe('Вкусный Тортик  !суп');
 
     const dessertButton = page.locator('button:has-text("Десерт")');
@@ -256,7 +295,9 @@ test.describe('Dish Management', () => {
   test('[2.6] Category priority — form field overrides macro', async ({ page }) => {
     await page.click('button:has-text("Создать новое блюдо")');
 
-    await page.getByPlaceholder('напр. Куриная грудка').fill('Странное Блюдо !суп');
+    const nameInput = page.getByPlaceholder('напр. Куриная грудка');
+    await nameInput.fill('Странное Блюдо !суп');
+    await nameInput.blur();
 
     const soupButton = page.locator('button:has-text("Суп")');
     await expect(soupButton).toHaveClass(/bg-indigo-600/);

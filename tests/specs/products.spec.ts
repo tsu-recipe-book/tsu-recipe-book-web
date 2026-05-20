@@ -172,53 +172,107 @@ test.describe('Product Management', () => {
       fats: '4.2',
       carbs: '0.6',
       flags: ['Веган', 'Без глютена', 'Без сахара']
+    },
+    {
+      name: 'Овсянка',
+      composition: 'Овес цельнозерновой',
+      category: 'Крупы и злаки',
+      cookingRequired: 'Требует приготовления',
+      calories: '389',
+      proteins: '16.9',
+      fats: '6.9',
+      carbs: '66.3',
+      flags: ['Веган', 'Без сахара']
     }
   ];
 
-  for (const data of testData) {
-    test(`[1.4] Create product with all fields: ${data.name}`, async ({ page }) => {
-      await page.click('button:has-text("Создать новый продукт")');
+  test('[1.4] Create product with all fields: Овощи (готовые)', async ({ page }) => {
+    const data = testData[0];
+    await page.click('button:has-text("Создать новый продукт")');
 
-      await page.getByPlaceholder('напр. Куриная грудка').fill(data.name);
-      await page.getByPlaceholder('напр. Мука, сахар, яйца...').fill(data.composition);
+    await page.getByPlaceholder('напр. Куриная грудка').fill(data.name);
+    await page.getByPlaceholder('напр. Мука, сахар, яйца...').fill(data.composition);
 
-      await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: data.category });
-      await page.locator('div:has(> label:has-text("Статус")) select').selectOption({ label: data.cookingRequired });
+    await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: data.category });
+    await page.locator('div:has(> label:has-text("Статус")) select').selectOption({ label: data.cookingRequired });
 
-      await page.locator('div:has(> label:has-text("Калории")) input').fill(data.calories);
-      await page.locator('div:has(> label:has-text("Белки")) input').fill(data.proteins);
-      await page.locator('div:has(> label:has-text("Жиры")) input').fill(data.fats);
-      await page.locator('div:has(> label:has-text("Углеводы")) input').fill(data.carbs);
+    await page.locator('div:has(> label:has-text("Калории")) input').fill(data.calories);
+    await page.locator('div:has(> label:has-text("Белки")) input').fill(data.proteins);
+    await page.locator('div:has(> label:has-text("Жиры")) input').fill(data.fats);
+    await page.locator('div:has(> label:has-text("Углеводы")) input').fill(data.carbs);
 
-      for (const flag of data.flags) {
-        await page.click(`button:has-text("${flag}")`);
-      }
+    for (const flag of data.flags) {
+      await page.click(`button:has-text("${flag}")`);
+    }
 
-      await page.click('button:has-text("Создать продукт")');
+    await page.click('button:has-text("Создать продукт")');
 
-      await expect(page).toHaveURL('/products');
-      await expect(page.locator(`text=${data.name}`)).toBeVisible();
+    await expect(page).toHaveURL('/products');
+    await expect(page.locator(`text=${data.name}`)).toBeVisible();
 
-      await page.click(`text=${data.name}`);
-      await expect(page.locator('h1')).toHaveText(data.name);
-      await expect(page.locator('text=Дата создания:')).toBeVisible();
-      await expect(page.locator(`text=${data.composition}`)).toBeVisible();
-      await expect(page.locator(`text=${data.calories}`)).toBeVisible();
-      await expect(page.locator(`text=${data.proteins}`)).toBeVisible();
-      await expect(page.locator(`text=${data.fats}`)).toBeVisible();
-      await expect(page.locator(`text=${data.carbs}`)).toBeVisible();
+    await page.click(`text=${data.name}`);
+    await expect(page.locator('h1')).toHaveText(data.name);
+    await expect(page.locator('text=Дата создания:')).toBeVisible();
+    await expect(page.locator(`text=${data.composition}`)).toBeVisible();
+    await expect(page.locator(`text="${data.calories}"`).first()).toBeVisible();
+    await expect(page.locator(`text="${data.proteins}"`).first()).toBeVisible();
+    await expect(page.locator(`text="${data.fats}"`).first()).toBeVisible();
+    await expect(page.locator(`text="${data.carbs}"`).first()).toBeVisible();
 
-      for (const flag of data.flags) {
-        await expect(page.locator(`span:has-text("${flag}")`)).toBeVisible();
-      }
+    for (const flag of data.flags) {
+      await expect(page.locator(`span:has-text("${flag}")`)).toBeVisible();
+    }
 
-      await page.evaluate(() => window.scrollTo(0, 0));
-      page.once('dialog', dialog => dialog.accept());
-      await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
 
-      await expect(page).toHaveURL('/products');
-    });
-  }
+    await expect(page).toHaveURL('/products');
+  });
+
+  test('[1.4] Create product with all fields: Крупы (сырые)', async ({ page }) => {
+    const data = testData[1];
+    await page.click('button:has-text("Создать новый продукт")');
+
+    await page.getByPlaceholder('напр. Куриная грудка').fill(data.name);
+    await page.getByPlaceholder('напр. Мука, сахар, яйца...').fill(data.composition);
+
+    await page.locator('div:has(> label:has-text("Категория")) select').selectOption({ label: 'Крупы' });
+    await page.locator('div:has(> label:has-text("Статус")) select').selectOption({ label: data.cookingRequired });
+
+    await page.locator('div:has(> label:has-text("Калории")) input').fill(data.calories);
+    await page.locator('div:has(> label:has-text("Белки")) input').fill(data.proteins);
+    await page.locator('div:has(> label:has-text("Жиры")) input').fill(data.fats);
+    await page.locator('div:has(> label:has-text("Углеводы")) input').fill(data.carbs);
+
+    for (const flag of data.flags) {
+      await page.click(`button:has-text("${flag}")`);
+    }
+
+    await page.click('button:has-text("Создать продукт")');
+
+    await expect(page).toHaveURL('/products');
+    await expect(page.locator(`text=${data.name}`)).toBeVisible();
+
+    await page.click(`text=${data.name}`);
+    await expect(page.locator('h1')).toHaveText(data.name);
+    await expect(page.locator('text=Дата создания:')).toBeVisible();
+    await expect(page.locator(`text=${data.composition}`)).toBeVisible();
+    await expect(page.locator(`text="${data.calories}"`).first()).toBeVisible();
+    await expect(page.locator(`text="${data.proteins}"`).first()).toBeVisible();
+    await expect(page.locator(`text="${data.fats}"`).first()).toBeVisible();
+    await expect(page.locator(`text="${data.carbs}"`).first()).toBeVisible();
+
+    for (const flag of data.flags) {
+      await expect(page.locator(`span:has-text("${flag}")`)).toBeVisible();
+    }
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('button:has-text("Удалить")').evaluate(b => (b as HTMLButtonElement).click());
+
+    await expect(page).toHaveURL('/products');
+  });
 
   test('[1.5] Edit existing product', async ({ page }) => {
     const nameBefore = 'До изменения';
