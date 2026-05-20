@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://109.120.157.233:8081';
+export const BASE_URL = 'https://tsu-recipe.orexi4.ru';
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
