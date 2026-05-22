@@ -104,7 +104,7 @@ test.describe('Dish Management', () => {
     await dishesPage.navigate();
   });
 
-  test('[2.1] Dish name length validation (BVA: 0 chars)', async ({ page }) => {
+  test('[2.1] Dish name length validation - 0 chars', async ({ page }) => {
     await dishesPage.clickCreateDish();
     await expect(page).toHaveURL('/dishes/new');
 
@@ -113,46 +113,42 @@ test.describe('Dish Management', () => {
     expect(isRequired).toBe(true);
   });
 
-  test('[2.1] Dish name length validation (BVA: 1 char)', async ({ page }) => {
-    await dishesPage.clickCreateDish();
-    await dishFormPage.fillName('А');
+  const invalidDishNameCases = [
+    { name: 'А', desc: '1 char' }
+  ];
 
-    await dishFormPage.addIngredient(prodAName);
+  for (const tc of invalidDishNameCases) {
+    test(`[2.1] Dish name length validation (Negative) - ${tc.desc}`, async ({ page }) => {
+      await dishesPage.clickCreateDish();
+      await dishFormPage.fillName(tc.name);
+      await dishFormPage.addIngredient(prodAName);
+      await dishFormPage.submit();
+      await expect(page).toHaveURL('/dishes/new');
 
-    await dishFormPage.submit();
-    await expect(page).toHaveURL('/dishes/new');
+      await expect(dishFormPage.errorAlert).toBeVisible();
+      await expect(dishFormPage.errorAlert).toContainText('Название должно быть не менее 2 символов');
+    });
+  }
 
-    await expect(dishFormPage.errorAlert).toBeVisible();
-    await expect(dishFormPage.errorAlert).toContainText('Название должно быть не менее 2 символов');
-  });
+  const validDishNameCases = [
+    { name: 'Аб', desc: '2 chars (min boundary)' },
+    { name: 'Абв', desc: '3 chars (EP)' }
+  ];
 
-  test('[2.1] Dish name length validation (BVA: 2 chars)', async ({ page }) => {
-    await dishesPage.clickCreateDish();
-    await dishFormPage.fillName('Аб');
+  for (const tc of validDishNameCases) {
+    test(`[2.1] Dish name length validation (Positive) - ${tc.desc}`, async ({ page }) => {
+      await dishesPage.clickCreateDish();
+      await dishFormPage.fillName(tc.name);
+      await dishFormPage.addIngredient(prodAName);
+      await dishFormPage.submit();
+      await page.waitForURL('**/dishes');
+      await expect(dishesPage.dishCards.filter({ hasText: tc.name })).toBeVisible();
 
-    await dishFormPage.addIngredient(prodAName);
-
-    await dishFormPage.submit();
-    await page.waitForURL('**/dishes');
-    await expect(dishesPage.dishCards.filter({ hasText: 'Аб' })).toBeVisible();
-
-    await dishesPage.clickDish('Аб');
-    await dishDetailsPage.deleteDish();
-  });
-
-  test('[2.1] Dish name length validation (BVA: 3 chars)', async ({ page }) => {
-    await dishesPage.clickCreateDish();
-    await dishFormPage.fillName('Абв');
-
-    await dishFormPage.addIngredient(prodAName);
-
-    await dishFormPage.submit();
-    await page.waitForURL('**/dishes');
-    await expect(dishesPage.dishCards.filter({ hasText: 'Абв' })).toBeVisible();
-
-    await dishesPage.clickDish('Абв');
-    await dishDetailsPage.deleteDish();
-  });
+      await dishesPage.clickDish(tc.name);
+      await dishDetailsPage.deleteDish();
+      await expect(page).toHaveURL('/dishes');
+    });
+  }
 
   test('[2.2] Dish photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
     await dishesPage.clickCreateDish();

@@ -61,7 +61,7 @@ test.describe('Product Management', () => {
     await productsPage.navigate();
   });
 
-  test('[1.1] Product name length validation (BVA: 0, 1, 2, 3 chars)', async ({ page }) => {
+  test('[1.1] Product name validation - 0 chars', async ({ page }) => {
     await productsPage.clickCreateProduct();
     await expect(page).toHaveURL('/products/new');
 
@@ -70,74 +70,86 @@ test.describe('Product Management', () => {
 
     const isRequired = await productFormPage.isNameRequired();
     expect(isRequired).toBe(true);
-
-    await productFormPage.fillName('А');
-    await productFormPage.submitCreate();
-
-    await expect(productFormPage.errorAlert).toBeVisible();
-    await expect(productFormPage.errorAlert).toContainText('Название должно быть не менее 2 символов');
-
-    await productFormPage.fillName('Аб');
-    await productFormPage.fillNutrition('100', '10', '5', '2');
-    await productFormPage.submitCreate();
-    await expect(page).toHaveURL('/products');
-
-    await productsPage.clickCreateProduct();
-    await productFormPage.fillName('Абв');
-    await productFormPage.fillNutrition('100', '10', '5', '2');
-    await productFormPage.submitCreate();
-    await expect(page).toHaveURL('/products');
-
-    await productsPage.clickProduct('Аб');
-    await productDetailsPage.deleteProduct();
-    await expect(page).toHaveURL('/products');
-
-    await productsPage.clickProduct('Абв');
-    await productDetailsPage.deleteProduct();
-    await expect(page).toHaveURL('/products');
   });
 
-  test('[1.2] PFC sum validation (BVA: 99.9g, 100.0g, 100.1g, 200.0g)', async ({ page }) => {
-    await productsPage.clickCreateProduct();
+  const invalidNameCases = [
+    { name: 'А', desc: '1 char' }
+  ];
 
-    const testName = 'Тест БЖУ Гран';
-    await productFormPage.fillName(testName);
+  for (const tc of invalidNameCases) {
+    test(`[1.1] Product name validation (Negative) - ${tc.desc}`, async () => {
+      await productsPage.clickCreateProduct();
+      await productFormPage.fillName(tc.name);
+      await productFormPage.fillNutrition('100', '10', '5', '2');
+      await productFormPage.submitCreate();
 
-    await productFormPage.caloriesInput.fill('150');
-    await productFormPage.proteinsInput.fill('30');
-    await productFormPage.fatsInput.fill('30');
+      await expect(productFormPage.errorAlert).toBeVisible();
+      await expect(productFormPage.errorAlert).toContainText('Название должно быть не менее 2 символов');
+    });
+  }
 
-    await productFormPage.carbsInput.fill('140');
-    await productFormPage.submitCreate();
-    await expect(productFormPage.errorAlert).toBeVisible();
-    await expect(productFormPage.errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
+  const validNameCases = [
+    { name: 'Аб', desc: '2 chars (min boundary)' },
+    { name: 'Абв', desc: '3 chars (EP)' }
+  ];
 
-    await productFormPage.carbsInput.fill('40.1');
-    await productFormPage.submitCreate();
-    await expect(productFormPage.errorAlert).toBeVisible();
-    await expect(productFormPage.errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
+  for (const tc of validNameCases) {
+    test(`[1.1] Product name validation (Positive) - ${tc.desc}`, async ({ page }) => {
+      await productsPage.clickCreateProduct();
+      await productFormPage.fillName(tc.name);
+      await productFormPage.fillNutrition('100', '10', '5', '2');
+      await productFormPage.submitCreate();
+      await expect(page).toHaveURL('/products');
 
-    await productFormPage.carbsInput.fill('40.0');
-    await productFormPage.submitCreate();
-    await expect(page).toHaveURL('/products');
+      await productsPage.clickProduct(tc.name);
+      await productDetailsPage.deleteProduct();
+      await expect(page).toHaveURL('/products');
+    });
+  }
 
-    await productsPage.clickProduct(testName);
-    await productDetailsPage.deleteProduct();
-    await expect(page).toHaveURL('/products');
+  const invalidPfcCases = [
+    { carbs: '140', sum: '200.0g', desc: '200.0g (max boundary negative)' },
+    { carbs: '40.1', sum: '100.1g', desc: '100.1g (boundary negative)' }
+  ];
 
-    await productsPage.clickCreateProduct();
-    await productFormPage.fillName(testName);
-    await productFormPage.caloriesInput.fill('150');
-    await productFormPage.proteinsInput.fill('30');
-    await productFormPage.fatsInput.fill('30');
-    await productFormPage.carbsInput.fill('39.9');
-    await productFormPage.submitCreate();
-    await expect(page).toHaveURL('/products');
+  for (const tc of invalidPfcCases) {
+    test(`[1.2] Product PFC sum validation (Negative) - ${tc.desc}`, async () => {
+      await productsPage.clickCreateProduct();
+      const testName = 'Тест БЖУ Гран';
+      await productFormPage.fillName(testName);
+      await productFormPage.caloriesInput.fill('150');
+      await productFormPage.proteinsInput.fill('30');
+      await productFormPage.fatsInput.fill('30');
+      await productFormPage.carbsInput.fill(tc.carbs);
+      await productFormPage.submitCreate();
 
-    await productsPage.clickProduct(testName);
-    await productDetailsPage.deleteProduct();
-    await expect(page).toHaveURL('/products');
-  });
+      await expect(productFormPage.errorAlert).toBeVisible();
+      await expect(productFormPage.errorAlert).toContainText('Сумма белков, жиров и углеводов не может превышать 100г');
+    });
+  }
+
+  const validPfcCases = [
+    { carbs: '40.0', sum: '100.0g', desc: '100.0g (boundary positive)' },
+    { carbs: '39.9', sum: '99.9g', desc: '99.9g (EP positive)' }
+  ];
+
+  for (const tc of validPfcCases) {
+    test(`[1.2] Product PFC sum validation (Positive) - ${tc.desc}`, async ({ page }) => {
+      await productsPage.clickCreateProduct();
+      const testName = 'Тест БЖУ Гран';
+      await productFormPage.fillName(testName);
+      await productFormPage.caloriesInput.fill('150');
+      await productFormPage.proteinsInput.fill('30');
+      await productFormPage.fatsInput.fill('30');
+      await productFormPage.carbsInput.fill(tc.carbs);
+      await productFormPage.submitCreate();
+      await expect(page).toHaveURL('/products');
+
+      await productsPage.clickProduct(testName);
+      await productDetailsPage.deleteProduct();
+      await expect(page).toHaveURL('/products');
+    });
+  }
 
   test('[1.3] Product photos limit validation (BVA: 4 vs 5 photos)', async ({ page }) => {
     await productsPage.clickCreateProduct();
