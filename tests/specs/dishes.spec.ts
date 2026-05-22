@@ -20,8 +20,13 @@ test.describe('Dish Management', () => {
     if (!res.ok()) return;
 
     const products = await res.json();
-    const namesToClean = [prodAName, prodBName, veganProdName];
-    const productsToDelete = products.filter((p: any) => namesToClean.includes(p.name));
+    const namesToClean = [
+      prodAName, prodBName, veganProdName,
+      'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу', 'Овсянка',
+      'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт'
+    ];
+    const cleanSet = new Set(namesToClean.map(n => n.trim().toLowerCase()));
+    const productsToDelete = products.filter((p: any) => p.name && cleanSet.has(p.name.trim().toLowerCase()));
 
     await Promise.all(productsToDelete.map((p: any) =>
       request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`)
@@ -38,7 +43,8 @@ test.describe('Dish Management', () => {
       'Блюдо для Редактирования', 'Блюдо с ингредиентом', 'Ааа Веган Салат', 'Яяя Мясной Суп',
       'А', 'Аб', 'Абв', 'Яблоко'
     ];
-    const dishesToDelete = dishes.filter((d: any) => namesToClean.includes(d.name));
+    const cleanSet = new Set(namesToClean.map(n => n.trim().toLowerCase()));
+    const dishesToDelete = dishes.filter((d: any) => d.name && cleanSet.has(d.name.trim().toLowerCase()));
 
     await Promise.all(dishesToDelete.map((d: any) =>
       request.delete(`https://tsu-recipe.orexi4.ru/api/v1/dishes/${d.id}`)

@@ -8,17 +8,36 @@ test.describe('Product Management', () => {
   let productFormPage: ProductFormPage;
   let productDetailsPage: ProductDetailsPage;
 
+  const cleanOldDishes = async (request: APIRequestContext) => {
+    const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/dishes');
+    if (!res.ok()) return;
+
+    const dishes = await res.json();
+    const namesToClean = [
+      'Тестовое Блюдо', 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен',
+      'Блюдо для Редактирования', 'Блюдо с ингредиентом', 'Ааа Веган Салат', 'Яяя Мясной Суп',
+      'А', 'Аб', 'Абв', 'Яблоко'
+    ];
+    const cleanSet = new Set(namesToClean.map(n => n.trim().toLowerCase()));
+    const dishesToDelete = dishes.filter((d: any) => d.name && cleanSet.has(d.name.trim().toLowerCase()));
+
+    await Promise.all(dishesToDelete.map((d: any) =>
+      request.delete(`https://tsu-recipe.orexi4.ru/api/v1/dishes/${d.id}`)
+    ));
+  };
+
   const cleanOldProducts = async (request: APIRequestContext) => {
     const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
     if (!res.ok()) return;
 
     const products = await res.json();
     const namesToClean = [
-      'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу',
-      'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт'
+      'Аб', 'Абв', 'Тест БЖУ Гран', 'Диетический Тофу', 'Овсянка',
+      'До изменения', 'После изменения', 'Ааа Веган Продукт', 'Яяя Мясной Продукт',
+      'Ингредиент А', 'Ингредиент Б', 'Веганский Продукт'
     ];
-
-    const productsToDelete = products.filter((p: any) => namesToClean.includes(p.name));
+    const cleanSet = new Set(namesToClean.map(n => n.trim().toLowerCase()));
+    const productsToDelete = products.filter((p: any) => p.name && cleanSet.has(p.name.trim().toLowerCase()));
 
     await Promise.all(productsToDelete.map((p: any) =>
       request.delete(`https://tsu-recipe.orexi4.ru/api/v1/products/${p.id}`)
@@ -26,10 +45,12 @@ test.describe('Product Management', () => {
   };
 
   test.beforeAll(async ({ request }) => {
+    await cleanOldDishes(request);
     await cleanOldProducts(request);
   });
 
   test.afterAll(async ({ request }) => {
+    await cleanOldDishes(request);
     await cleanOldProducts(request);
   });
 

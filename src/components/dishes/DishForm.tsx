@@ -183,7 +183,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
 
 
     const formData = new FormData();
-    formData.append('name', name);
+    formData.append('name', name.trim());
     formData.append('category', category);
 
     selectedIngredients.forEach((ing, index) => {

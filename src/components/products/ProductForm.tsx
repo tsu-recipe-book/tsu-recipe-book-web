@@ -98,7 +98,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit 
     }
 
     const formData = new FormData();
-    formData.append('name', name);
+    formData.append('name', name.trim());
     formData.append('composition', composition);
     formData.append('category', category);
     formData.append('cookingRequired', cookingRequired);
