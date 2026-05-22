@@ -15,10 +15,6 @@ test.describe('Dish Management', () => {
   const veganProdName = 'Веганский Продукт';
   const dishName = 'Тестовое Блюдо';
 
-  let prodAId: string;
-  let prodBId: string;
-  let veganProdId: string;
-
   const cleanOldProducts = async (request: APIRequestContext) => {
     const res = await request.get('https://tsu-recipe.orexi4.ru/api/v1/products');
     if (!res.ok()) return;
@@ -40,7 +36,7 @@ test.describe('Dish Management', () => {
     const namesToClean = [
       dishName, 'Борщ домашний', 'Вкусный Тортик', 'Странное Блюдо', 'Рецепт Изменен',
       'Блюдо для Редактирования', 'Блюдо с ингредиентом', 'Ааа Веган Салат', 'Яяя Мясной Суп',
-      'А', 'Аб', 'Абв'
+      'А', 'Аб', 'Абв', 'Яблоко'
     ];
     const dishesToDelete = dishes.filter((d: any) => namesToClean.includes(d.name));
 
@@ -64,8 +60,7 @@ test.describe('Dish Management', () => {
     formA.append('composition', 'Тестовый ингредиент А');
 
     const resA = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', { method: 'POST', body: formA });
-    const dataA = await resA.json() as any;
-    prodAId = dataA.id;
+    expect(resA.ok).toBeTruthy();
 
     const formB = new FormData();
     formB.append('name', prodBName);
@@ -78,8 +73,7 @@ test.describe('Dish Management', () => {
     formB.append('composition', 'Тестовый ингредиент Б');
 
     const resB = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', { method: 'POST', body: formB });
-    const dataB = await resB.json() as any;
-    prodBId = dataB.id;
+    expect(resB.ok).toBeTruthy();
 
     const formData = new FormData();
     formData.append('name', veganProdName);
@@ -94,8 +88,7 @@ test.describe('Dish Management', () => {
     formData.append('flags', 'SUGAR_FREE');
 
     const resVegan = await fetch('https://tsu-recipe.orexi4.ru/api/v1/products', { method: 'POST', body: formData });
-    const dataVegan = await resVegan.json() as any;
-    veganProdId = dataVegan.id;
+    expect(resVegan.ok).toBeTruthy();
   });
 
   test.beforeEach(async ({ page }) => {
@@ -122,6 +115,9 @@ test.describe('Dish Management', () => {
 
     await dishFormPage.submit();
     await expect(page).toHaveURL('/dishes/new');
+
+    await expect(dishFormPage.errorAlert).toBeVisible();
+    await expect(dishFormPage.errorAlert).toContainText('Название должно быть не менее 2 символов');
   });
 
   test('[2.1] Dish name length validation (BVA: 2 chars)', async ({ page }) => {
@@ -217,7 +213,6 @@ test.describe('Dish Management', () => {
   test('[2.4] Automatic category determination by macro with DB save verification (Суп)', async ({ page }) => {
     await dishesPage.clickCreateDish();
     await dishFormPage.fillName('Борщ домашний !суп');
-    await dishFormPage.blurName();
 
     const nameVal = await dishFormPage.nameInput.inputValue();
     expect(nameVal.trim()).toBe('Борщ домашний');
@@ -238,7 +233,6 @@ test.describe('Dish Management', () => {
   test('[2.4] Automatic category determination by macro with DB save verification (Перекус)', async ({ page }) => {
     await dishesPage.clickCreateDish();
     await dishFormPage.fillName('Яблоко !перекус');
-    await dishFormPage.blurName();
 
     const nameVal = await dishFormPage.nameInput.inputValue();
     expect(nameVal.trim()).toBe('Яблоко');
@@ -260,7 +254,6 @@ test.describe('Dish Management', () => {
     await dishesPage.clickCreateDish();
 
     await dishFormPage.fillName('Вкусный Тортик !десерт !суп');
-    await dishFormPage.blurName();
 
     const nameVal = await dishFormPage.nameInput.inputValue();
     expect(nameVal.trim()).toBe('Вкусный Тортик  !суп');
@@ -273,7 +266,6 @@ test.describe('Dish Management', () => {
     await dishesPage.clickCreateDish();
 
     await dishFormPage.fillName('Странное Блюдо !суп');
-    await dishFormPage.blurName();
 
     await expect(dishFormPage.getCategoryButton('Суп')).toHaveClass(/bg-indigo-600/);
 

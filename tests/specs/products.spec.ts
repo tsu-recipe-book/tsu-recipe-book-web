@@ -57,6 +57,7 @@ test.describe('Product Management', () => {
     await expect(productFormPage.errorAlert).toContainText('Название должно быть не менее 2 символов');
 
     await productFormPage.fillName('Аб');
+    await productFormPage.fillNutrition('100', '10', '5', '2');
     await productFormPage.submitCreate();
     await expect(page).toHaveURL('/products');
 
@@ -151,7 +152,7 @@ test.describe('Product Management', () => {
     {
       name: 'Овсянка',
       composition: 'Овес цельнозерновой',
-      category: 'Крупы и злаки',
+      category: 'Крупы',
       cookingRequired: 'Требует приготовления',
       calories: '389',
       proteins: '16.9',
@@ -206,7 +207,7 @@ test.describe('Product Management', () => {
     await productFormPage.fillName(data.name);
     await productFormPage.fillComposition(data.composition);
 
-    await productFormPage.selectCategory('Крупы');
+    await productFormPage.selectCategory(data.category);
     await productFormPage.selectCookingStatus(data.cookingRequired);
 
     await productFormPage.fillNutrition(data.calories, data.proteins, data.fats, data.carbs);

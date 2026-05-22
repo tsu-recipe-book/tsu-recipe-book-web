@@ -9,24 +9,22 @@ export class DishFormPage {
   readonly firstPhotoCard: Locator;
   readonly deleteFirstPhotoBtn: Locator;
   readonly submitBtn: Locator;
+  readonly errorAlert: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.nameInput = page.getByPlaceholder('напр. Куриная грудка');
     this.productSearchInput = page.getByPlaceholder('Поиск продуктов...');
     this.addPhotoLabel = page.locator('label:has-text("Добавить")');
-    this.photoFileInput = this.addPhotoLabel.locator('input[type="file"]');
+    this.photoFileInput = page.locator('input[type="file"]');
     this.firstPhotoCard = page.locator('div.relative.aspect-square').first();
     this.deleteFirstPhotoBtn = this.firstPhotoCard.locator('button.bg-red-500');
     this.submitBtn = page.locator('button[type="submit"]');
+    this.errorAlert = page.locator('div.bg-red-50');
   }
 
   async fillName(name: string) {
     await this.nameInput.fill(name);
-  }
-
-  async blurName() {
-    await this.nameInput.blur();
   }
 
   async searchProduct(name: string) {

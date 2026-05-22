@@ -27,7 +27,7 @@ export class ProductFormPage {
     this.fatsInput = page.locator('div:has(> label:has-text("Жиры")) input');
     this.carbsInput = page.locator('div:has(> label:has-text("Углеводы")) input');
     this.addPhotoLabel = page.locator('label:has-text("Добавить")');
-    this.photoFileInput = this.addPhotoLabel.locator('input[type="file"]');
+    this.photoFileInput = page.locator('input[type="file"]');
     this.firstPhotoCard = page.locator('div.relative.aspect-square').first();
     this.deleteFirstPhotoBtn = this.firstPhotoCard.locator('button.bg-red-500');
     this.errorAlert = page.locator('div.bg-red-50');

@@ -172,7 +172,7 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
+    if (name.trim().length < 2) {
       setError(t('products.form.nameError'));
       return;
     }
@@ -186,7 +186,6 @@ export const DishForm: React.FC<DishFormProps> = ({ initialData, onSubmit }) => 
     formData.append('name', name);
     formData.append('category', category);
 
-    // Format ingredients for backend: productId:weight
     selectedIngredients.forEach((ing, index) => {
       formData.append(`ingredients[${index}].productId`, ing.product.id);
       formData.append(`ingredients[${index}].weight`, ing.weight.toString());
